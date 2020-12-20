@@ -9,11 +9,13 @@ import (
 var DEBUG = false
 
 // Digits class.
+// Designed to facilitate the manipulation of the digits of a number
+// during long division calculation such that working can be shown.
 type Digits struct {
     digits []float64
 }
 
-// Initialise to the length of num and populate the digits
+// Initialise to the length of digits of num and populate the digits
 // from num.
 func (d *Digits) Init(num int) () {
     lenN := 1
@@ -41,6 +43,7 @@ func (d *Digits) InitFixed(lenN int, num int) () {
     }
 }
 
+// Set a single digit if in range else no op.
 func (d *Digits) SetDigit(di int, digit float64) () {
     if (di >= 0 && di < len(d.digits)) {
         d.digits[di] = digit
@@ -48,6 +51,7 @@ func (d *Digits) SetDigit(di int, digit float64) () {
     // Else no op
 }
 
+// Return a single digit if in range else return undefined digit.
 func (d Digits) Digit(di int) (digit float64) {
     if (di >= 0 && di < len(d.digits)) {
         digit = d.digits[di]
@@ -56,6 +60,8 @@ func (d Digits) Digit(di int) (digit float64) {
     return digit
 }
 
+// Print digits with leading statement including the name supplied.
+// E.g. d.Print("myDigits") => "Digits of myDigits: 123"
 func (d *Digits) Print(name string) () {
     fmt.Printf("Digits of %v: ", name)
     for i := range d.digits {
@@ -64,6 +70,7 @@ func (d *Digits) Print(name string) () {
     fmt.Printf("\n")
 }
 
+// Return a string of digits. Left pad with spaces if leading zeros.
 func (d *Digits) Sprint() (digits string) {
 
     leading := true
@@ -79,6 +86,8 @@ func (d *Digits) Sprint() (digits string) {
     return digits
 }
 
+// Return a string containg a single digit at the index supplied
+// if in range else return an undefined string.
 func (d *Digits) SprintDigit(di int) (digit string) {
 
     if (di >= 0 && di < len(d.digits)) {
@@ -87,6 +96,10 @@ func (d *Digits) SprintDigit(di int) (digit string) {
     return digit
 }
 
+// Helper function for long division algorithm. Computes the number
+// corresponding to the digits of the part of the numerator needed
+// to perform the next step in the long divison algorithm. The number
+// is returned as a float64.
 func (d *Digits) PartN(j int) (partN float64) {
     partN = 0
     for k := 0; k <= j; k++ {
@@ -99,11 +112,15 @@ func (d *Digits) PartN(j int) (partN float64) {
     return partN
 }
 
+// Returns the number of digits.
 func (d *Digits) Len() (lend int) {
     lend = len(d.digits)
     return lend
 }
 
+// Compares two sets of digits.
+// Silently returns true if the are the same (length and digits match).
+// Returns false if they don't match and prints the first difference found.
 func (d *Digits) Compare(d2 Digits) (equal bool) {
     // First compare lengths
     equal = (len(d.digits) == len(d2.digits))
