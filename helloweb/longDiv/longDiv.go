@@ -30,6 +30,7 @@ func main() {
         os.Exit(1)
     }
     DEBUG = *argDebug
+    d.DEBUG = *argDebug
     if !SelfTest() { os.Exit(1)}
     digitsD, quotient, interim, rem := LongDiv(*argDenom, *argNum)
     PrintWorking(digitsD, quotient, interim, rem)
