@@ -1,40 +1,15 @@
-package main
+package longDiv
 
 import (
     "fmt"
     "math"
-    "os"
     "strings"
-    "flag"
     d "helloweb/digits"
 )
-
-
-// Define the cmd line arguments for this program.
-var argDenom = flag.Int("d", 12,
-                "d=<denominator> e.g. d=12, must be a +ve integer")
-var argNum = flag.Int("n", 143,
-                "n=<numerator> e.g. n=143, must be a +ve integer")
-var argDebug = flag.Bool("debug", false,
-                "debug=<false|true>, turn on/off debug output")
 
 // Globals
 var DEBUG = false
 
-// TODO: then in HTML - do this when transferrng to a webserver.
-func main() {
-
-    flag.Parse()
-    if !flag.Parsed() {
-        flag.PrintDefaults()
-        os.Exit(1)
-    }
-    DEBUG = *argDebug
-    d.DEBUG = *argDebug
-    if !SelfTest() { os.Exit(1)}
-    digitsD, quotient, interim, rem := LongDiv(*argDenom, *argNum)
-    PrintWorking(digitsD, quotient, interim, rem)
-}
 
 // Notes:
 // Separates out interim quotient from quotient
@@ -190,6 +165,34 @@ func PrintWorking(digitsD d.Digits, quotient d.Digits,
         }
     }
     fmt.Printf("\n==================================\n")
+}
+
+func GenerateHtml(digitsD d.Digits, quotient d.Digits,
+                          interim []d.Digits, rem int) (htmlStr string) {
+    // Print the quotient, a space and then remainder = the remainder
+    // Print the divide bar
+    // Print the denom and a vertical bar then the first row of interim
+    // Print the interim rows
+    // Get the padding right!
+
+    lenD := digitsD.Len()
+    fmtStr := fmt.Sprintf("%%%vv", lenD + 1 + quotient.Len())
+    htmlStr = fmt.Sprintf(fmtStr + " remainder=%v<br>", quotient.Sprint(), rem)
+    lenI0 := interim[0].Len()
+    htmlStr += fmt.Sprintf(fmtStr + "<br>", strings.Repeat("-",lenI0 + 1))
+    htmlStr += fmt.Sprintf("%v|%v<br>", digitsD.Sprint(), interim[0].Sprint())
+    endStop := lenD + 1 + lenI0
+    for i := 1; i < len(interim); i++ {
+        if interim[i].Len() < 1 {
+            break;
+        }
+        fmtStr = fmt.Sprintf("%%%vv", endStop)
+        htmlStr += fmt.Sprintf(fmtStr + "<br>", interim[i].Sprint())
+        if math.Mod(float64(i), 2.0) == 1 {
+            htmlStr += fmt.Sprintf(fmtStr + "<br>", strings.Repeat("-", lenI0))
+        }
+    }
+    return htmlStr
 }
 
 func SelfTest() (bool) {

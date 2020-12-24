@@ -234,7 +234,7 @@ func LongMultHandler(w http.ResponseWriter, r *http.Request) {
 
     number2, _ := strconv.ParseFloat(number2Str, 64)
 
-    result := PrintWorking(LongMult(int(number1), int(number2)))
+    result := GenerateHtml(LongMult(int(number1), int(number2)))
 
     fmt.Fprintf(w, "%v\n\n:-)", result)
     //log.Println(w)
@@ -315,7 +315,7 @@ func LongMult(bnum int, anum int) ([]float64, []float64,
 
 // TODO: convert the otuput to a html table to enable column placing control with
 //       different font sizes for the carry values.
-func PrintWorking(digitsA []float64, digitsB []float64,
+func GenerateHtml(digitsA []float64, digitsB []float64,
                   product [][]float64, carrys [][]float64) string {
 
     workingStr := fmt.Sprintf("")
