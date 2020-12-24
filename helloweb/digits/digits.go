@@ -119,7 +119,7 @@ func (d *Digits) Len() (lend int) {
 }
 
 // Compares two sets of digits.
-// Silently returns true if the are the same (length and digits match).
+// Silently returns true if they are the same (length and digits match).
 // Returns false if they don't match and prints the first difference found.
 func (d *Digits) Compare(d2 Digits) (equal bool) {
     // First compare lengths
