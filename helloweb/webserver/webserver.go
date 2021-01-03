@@ -19,8 +19,8 @@ import (
     "net/http"
     "os"
     "strconv"
+    "time"
 )
-
 
 func main() {
 
@@ -31,21 +31,47 @@ func main() {
     }
     fmt.Printf("passed. Starting webserver ...\n")
 
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+
+    // use PORT environPrimeHandlerment variable, or default to 8080
+    port := "8080"
+    if fromEnv := os.Getenv("PORT"); fromEnv != "" {
+        port = fromEnv
+    }
+
+    // register hello function to handle all requests
+    server := http.NewServeMux()
+
+    // The default page is served from the local directory.
+    server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, r.URL.Path[1:])
     })
 
+    server.HandleFunc("/hello", hello)
+    server.HandleFunc("/prime", PrimeHandler)
+    server.HandleFunc("/gcd", GcdHandler)
+    server.HandleFunc("/longmult", LongMultHandler)
 
-    http.HandleFunc("/prime", PrimeHandler)
-    http.HandleFunc("/gcd", GcdHandler)
-    http.HandleFunc("/longmult", LongMultHandler)
 
-    log.Fatal(http.ListenAndServe(":8081", nil))
+
+    // start the web server on port and accept requests
+    fmt.Printf("Server listening on port %s", port)
+    err := http.ListenAndServe(":"+port, server)
+    log.Fatal(err)
+}
+
+// hello responds to the request with a plain-text "Hello, world" message.
+func hello(w http.ResponseWriter, r *http.Request) {
+    fmt.Printf("Serving request: %s", r.URL.Path)
+    host, _ := os.Hostname()
+    fmt.Fprintf(w, "Hello, GKE!\n")
+    fmt.Fprintf(w, "Version: 3.1.0\n")
+    fmt.Fprintf(w, "Hostname: %s\n", host)
+    fmt.Fprintf(w, "Private message: Daddy loves you Pops!\n")
+    fmt.Fprintf(w, "Time: %v\n", time.Now())
 }
 
 func PrimeHandler(w http.ResponseWriter, r *http.Request) {
 
-    //log.Println(r)
     numbers, ok := r.URL.Query()["number"]
 
     if !ok || len(numbers[0]) < 1 {
@@ -67,8 +93,6 @@ func PrimeHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     fmt.Fprintf(w, "%v %v", number, result)
-    //log.Println(w)
-    //log.Printf("%v %v", number, result)
 }
 
 // TODO: Move IsPrime and its test driver out into another package.
@@ -125,14 +149,14 @@ func TestIsPrime() bool {
     if IsPrime(1) && IsPrime(2) && IsPrime(3) && IsPrime(5) && IsPrime(7) && IsPrime(11) {
         pass += 6
     } else {
-        fmt.Printf("FAIL: isPrime returned false for a prime\n")
+        log.Printf("FAIL: isPrime returned false for a prime\n")
     }
     tests += 6
 
     if !(IsPrime(4) || IsPrime(6) || IsPrime(8) || IsPrime(9) || IsPrime(10)) {
         pass += 5
     } else {
-        fmt.Printf("FAIL: isPrime returned true for a non-prime\n")
+        log.Printf("FAIL: isPrime returned true for a non-prime\n")
     }
     tests += 5
 
@@ -140,14 +164,14 @@ func TestIsPrime() bool {
     if IsPrime(23) && IsPrime(29) && IsPrime(37) && IsPrime(97) && IsPrime(107) {
         pass += 5
     } else {
-        fmt.Printf("FAIL: isPrime returned false for a prime\n")
+        log.Printf("FAIL: isPrime returned false for a prime\n")
     }
     tests += 5
 
     if !(IsPrime(24) || IsPrime(25) || IsPrime(38) || IsPrime(99) || IsPrime(115)) {
         pass += 5
     } else {
-        fmt.Printf("FAIL: isPrime returned true for a non-prime\n")
+        log.Printf("FAIL: isPrime returned true for a non-prime\n")
     }
     tests += 5
 
@@ -156,7 +180,6 @@ func TestIsPrime() bool {
 
 func GcdHandler(w http.ResponseWriter, r *http.Request) {
 
-    //log.Println(r)
     numbers, ok := r.URL.Query()["number1"]
 
     if !ok || len(numbers[0]) < 1 {
@@ -190,8 +213,6 @@ func GcdHandler(w http.ResponseWriter, r *http.Request) {
     } else {
         fmt.Fprintf(w, "Nothing other than 1 :-(")
     }
-    //log.Println(w)
-    //log.Printf("%v %v %v", number1, number2, result)
 }
 
 func Gcd(ra float64, rb float64) float64 {
@@ -207,7 +228,6 @@ func Gcd(ra float64, rb float64) float64 {
 
 func LongMultHandler(w http.ResponseWriter, r *http.Request) {
 
-    //log.Println(r)
     numbers, ok := r.URL.Query()["number1"]
 
     if !ok || len(numbers[0]) < 1 {
@@ -237,8 +257,6 @@ func LongMultHandler(w http.ResponseWriter, r *http.Request) {
     result := GenerateHtml(LongMult(int(number1), int(number2)))
 
     fmt.Fprintf(w, "%v\n\n:-)", result)
-    //log.Println(w)
-    //log.Printf("%v %v %v", number1, number2, result)
 }
 
 
