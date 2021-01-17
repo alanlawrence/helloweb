@@ -2,10 +2,12 @@
  * This webserver accepts some simple input and returns a response.
  * Entry point is URL/  // Which finds the index.html file with the number form.
  * The form invokes an ajax request to URL/prime?number=13.
- * Or one can access the prime number checker directly by typing URL/prime?number=13
+ * Or one can access the prime number checker directly by typing 
+ *    URL/prime?number=13
  * directly in the browser address bar. It is all the same to this webserver.
- * The /prime handler extracts the number and works out if it is prime and writes
- * the result back.
+ * The /prime handler extracts the number and works out if it is prime and 
+ * writes the result back.
+ * Other functions are similarly implemented.
  */
 
 // TODO: Move this code into the GKE helloapp.
@@ -20,6 +22,7 @@ import (
     "os"
     "strconv"
     "time"
+    ld "helloweb/longDiv" //LongDiv produces long division working.
 )
 
 func main() {
@@ -50,11 +53,12 @@ func main() {
     server.HandleFunc("/prime", PrimeHandler)
     server.HandleFunc("/gcd", GcdHandler)
     server.HandleFunc("/longmult", LongMultHandler)
+    server.HandleFunc("/longdiv", LongDivHandler)
 
 
 
     // start the web server on port and accept requests
-    fmt.Printf("Server listening on port %s", port)
+    fmt.Printf("Server listening on port %s\n", port)
     err := http.ListenAndServe(":"+port, server)
     log.Fatal(err)
 }
@@ -259,6 +263,42 @@ func LongMultHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "%v\n\n:-)", result)
 }
 
+func LongDivHandler(w http.ResponseWriter, r *http.Request) {
+
+    numbers, ok := r.URL.Query()["denom"]
+
+    if !ok || len(numbers[0]) < 1 {
+        log.Println("Url Param 'denom' is missing")
+        return
+    }
+
+    // Query()["denom"] will return an array of items, 
+    // we only want the single item.
+    number1Str := numbers[0]
+
+    denom, _ := strconv.ParseFloat(number1Str, 64)
+
+    numbers, ok = r.URL.Query()["num"]
+
+    if !ok || len(numbers[0]) < 1 {
+        log.Println("Url Param 'num' is missing")
+        return
+    }
+
+    // Query()["num"] will return an array of items, 
+    // we only want the single item.
+    number2Str := numbers[0]
+
+    num, _ := strconv.ParseFloat(number2Str, 64)
+
+    //result := ld.GenerateHtml(ld.LongDiv(int(denom), int(num)))
+    // Just print to screen and return 'not implemented' for now ...
+    ld.PrintWorking(ld.LongDiv(int(denom), int(num)))
+    result := fmt.Sprintf("longdiv: not implemented yet. " +
+                          "Received denom=%v, num=%v", int(denom), int(num))
+
+    fmt.Fprintf(w, "%v\n\n:-)", result)
+}
 
 // Algorithm: https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication
 // TODO: Change code so first arg is the multiplier anum.
