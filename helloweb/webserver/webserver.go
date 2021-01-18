@@ -22,7 +22,7 @@ import (
     "os"
     "strconv"
     "time"
-    ld "helloweb/longDiv" //LongDiv produces long division working.
+    ld "helloweb/longDiv" // LongDiv produces long division working.
 )
 
 func main() {
@@ -291,11 +291,7 @@ func LongDivHandler(w http.ResponseWriter, r *http.Request) {
 
     num, _ := strconv.ParseFloat(number2Str, 64)
 
-    //result := ld.GenerateHtml(ld.LongDiv(int(denom), int(num)))
-    // Just print to screen and return 'not implemented' for now ...
-    ld.PrintWorking(ld.LongDiv(int(denom), int(num)))
-    result := fmt.Sprintf("longdiv: not implemented yet. " +
-                          "Received denom=%v, num=%v", int(denom), int(num))
+    result := ld.GenerateHtml(ld.LongDiv(int(denom), int(num)))
 
     fmt.Fprintf(w, "%v\n\n:-)", result)
 }
@@ -371,8 +367,6 @@ func LongMult(bnum int, anum int) ([]float64, []float64,
     return digitsA, digitsB, product, carrys
 }
 
-// TODO: convert the otuput to a html table to enable column placing control with
-//       different font sizes for the carry values.
 func GenerateHtml(digitsA []float64, digitsB []float64,
                   product [][]float64, carrys [][]float64) string {
 
