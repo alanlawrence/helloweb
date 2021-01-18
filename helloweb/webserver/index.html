@@ -34,6 +34,17 @@ function longMult(myNum1, myNum2) {
     xmlhttp.open("GET", "longmult?number1=" + myNum1 + "&number2=" + myNum2, true);
     xmlhttp.send();
 }
+
+function longDiv(myDenom, myNum) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("LongDiv").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET", "longdiv?denom=" + myDenom + "&num=" + myNum, true);
+    xmlhttp.send();
+}
 </script>
 </head>
 
@@ -67,5 +78,15 @@ function longMult(myNum1, myNum2) {
         <input type="submit" value="Submit">
     </form>
     Working: <p><pre><span id="LongMult"></span></pre></p>
+
+    <h1>Enter two integers and see their long division working</h1>
+    <form onsubmit="longDiv(document.getElementById('denom').value, document.getElementById('num').value); return false">
+        <label for="denom"> denominator:</label>
+        <input type="number" id="denom" name="denom">
+        <label for="num"> &nbsp;&nbsp; divides into numerator:</label>
+        <input type="number" id="num" name="num"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    Working: <p><pre><span id="LongDiv"></span></pre></p>
 </body>
 </html>
