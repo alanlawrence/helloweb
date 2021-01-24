@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: hello-app
-        image: gcr.io/alans-gcp-project/hello-app:v3.1
+        image: gcr.io/alans-gcp-project/hello-app:v3.2
         ports:
         - containerPort: 8080

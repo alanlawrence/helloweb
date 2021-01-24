@@ -1,5 +1,6 @@
 #!/bin/bash
-echo "This script builds and deploys a new container in 3 steps after editing main.go:"
+echo "This script builds and deploys a new container in 3 steps after editing"
+echo "or updating sources:"
 echo " 1. docker build"
 echo " 2. docker push // to the registry"
 echo " 3. update the helloweb-deployment.yaml with the new version using sed"
@@ -13,7 +14,8 @@ echo "Usage: <script> <ver>"
 echo 
 echo "Example: ./build-deploy.sh 3.1"
 echo "WARNING: assumes the app has been launched with ./launch-helloweb-app.sh"
-echo "Run in same directory as main.go and Dockerfile. Assumes yaml in ./manifests"
+echo "Run in same directory as the Dockerfile."
+echo "Assumes yaml in ./webserver/manifests"
 echo
 
 APP_NAME=hello-app
@@ -33,7 +35,7 @@ docker build -t gcr.io/${PROJECT_ID}/$APP_NAME:v$NEW_VER .
 docker push gcr.io/${PROJECT_ID}/$APP_NAME:v$NEW_VER
 echo
 echo "Now edit the deployment yaml file ..."
-cd manifests
+cd webserver/manifests
 pwd
 YAML_FILE="helloweb-deployment.yaml"
 echo "yaml filename=\"$YAML_FILE\""

@@ -1,0 +1,30 @@
+# Ignore special .git* files
+# Changed this to avoid ignoring the .gitsecret file
+.git
+
+# Added by git secret init:
+.gitsecret/keys/random_seed
+!*.secret
+
+# Ignore all .a files.
+*.a
+
+# Ignore vim swp files.
+*.swp
+
+# Ignore files in the bin directory, these are build results
+bin/
+
+# Ignore files in the pkg directly, these are build results
+pkg/
+
+# ################## git secret #####################################
+#
+# git secret automatically adds files here that were added with
+#
+#     git secret add <filename>
+#
+# This prevents the unencrypted version from being accidentally
+# added and committed to the repository.
+#
+helloweb/webserver/manifests/helloweb-ingress-static-ip.yaml
