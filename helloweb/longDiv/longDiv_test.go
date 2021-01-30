@@ -19,7 +19,7 @@ func TestGenerateHtml(t *testing.T) {
     // unless there is a test failure, i.e. t.Errorf(...)
     PrintWorking(LongDiv( 7,  15))
 
-    htmlStrExp := "   2 remainder=1<br> ---<br>7|15<br>  14<br>  --<br>   1<br>"
+    htmlStrExp := "   2 remainder=1<br> .--<br>7|15<br>  14<br>  --<br>   1<br>"
     htmlStr := GenerateHtml(LongDiv(7, 15))
     if htmlStr != htmlStrExp {
         t.Errorf("Expected html=\n\"%v\"\nbut got\n\"%v\"", htmlStrExp, htmlStr)

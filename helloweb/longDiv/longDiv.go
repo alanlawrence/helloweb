@@ -148,10 +148,10 @@ func PrintWorking(digitsD d.Digits, quotient d.Digits,
 
     fmt.Printf("==================================\n\n")
     lenD := digitsD.Len()
-    fmtStr := fmt.Sprintf("%%%vv", lenD + 1 + quotient.Len())
-    fmt.Printf(fmtStr + " remainder=%v\n", quotient.Sprint(), rem)
     lenI0 := interim[0].Len()
-    fmt.Printf(fmtStr + "\n", strings.Repeat("-",lenI0 + 1))
+    fmtStr := fmt.Sprintf("%%%vv", lenD + 1 + lenI0)
+    fmt.Printf(fmtStr + " remainder=%v\n", quotient.Sprint(), rem)
+    fmt.Printf(fmtStr + "\n", "." + strings.Repeat("-",lenI0))
     fmt.Printf("%v|%v\n", digitsD.Sprint(), interim[0].Sprint())
     endStop := lenD + 1 + lenI0
     for i := 1; i < len(interim); i++ {
@@ -170,16 +170,24 @@ func PrintWorking(digitsD d.Digits, quotient d.Digits,
 func GenerateHtml(digitsD d.Digits, quotient d.Digits,
                           interim []d.Digits, rem int) (htmlStr string) {
     // Print the quotient, a space and then remainder = the remainder
-    // Print the divide bar
+    // Print the first horizontal bar
     // Print the denom and a vertical bar then the first row of interim
     // Print the interim rows
     // Get the padding right!
 
-    lenD := digitsD.Len()
-    fmtStr := fmt.Sprintf("%%%vv", lenD + 1 + quotient.Len())
-    htmlStr = fmt.Sprintf(fmtStr + " remainder=%v<br>", quotient.Sprint(), rem)
+    lenD := digitsD.Len()  // len(denom)
+    // This line sets up the format string to the correct width to get the
+    // left hand padding: len(denom) + vertical line + len(numerator).
+    // The first row of interim[] is the numerator.
     lenI0 := interim[0].Len()
-    htmlStr += fmt.Sprintf(fmtStr + "<br>", strings.Repeat("-",lenI0 + 1))
+    fmtStr := fmt.Sprintf("%%%vv", lenD + 1 + lenI0)
+    // The first line contains the quotient followed by the remainder.
+    htmlStr = fmt.Sprintf(fmtStr + " remainder=%v<br>", quotient.Sprint(), rem)
+    // Now we set up the horizontal bar under the quotient:
+    //     len(denom) + vertical line + len(numerator)
+    // We use a "." to smooth the corner from the vertical bar to the 
+    // horizontal bar. The horizontal part is a dash per numerator digit.
+    htmlStr += fmt.Sprintf(fmtStr + "<br>", "." + strings.Repeat("-",lenI0))
     htmlStr += fmt.Sprintf("%v|%v<br>", digitsD.Sprint(), interim[0].Sprint())
     endStop := lenD + 1 + lenI0
     for i := 1; i < len(interim); i++ {
