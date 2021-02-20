@@ -30,7 +30,7 @@ echo "Using project id: $PROJECT_ID"
 $ECHO gcloud config set project $PROJECT_ID
 $ECHO gcloud config set compute/zone europe-west2-a
 $ECHO gcloud config get-value compute/zone
-$ECHO gcloud container clusters create hello-cluster --num-nodes=1
+$ECHO gcloud container clusters create hello-cluster --num-nodes=1 --release-channel=rapid
 $ECHO gcloud compute instances list
 $ECHO gcloud compute addresses create helloweb-ip --global
 $ECHO gcloud compute addresses describe helloweb-ip --global
