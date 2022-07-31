@@ -10,8 +10,6 @@
  * Other functions are similarly implemented.
  */
 
-// TODO: Move this code into the GKE helloapp.
-
 package main
 
 import (
@@ -23,6 +21,7 @@ import (
     "strconv"
     "time"
     ld "helloweb/longDiv" // LongDiv produces long division working.
+    quad "helloweb/quadratic" // Quadratic finds the roots.
 )
 
 func main() {
@@ -32,6 +31,8 @@ func main() {
     if !TestIsPrime() {
         os.Exit(1)
     }
+    // TODO: what about the other self test functions?
+    //     : those in packages are tested with "go test <package>"
     fmt.Printf("passed. Starting webserver ...\n")
 
 
@@ -54,6 +55,7 @@ func main() {
     server.HandleFunc("/gcd", GcdHandler)
     server.HandleFunc("/longmult", LongMultHandler)
     server.HandleFunc("/longdiv", LongDivHandler)
+    server.HandleFunc("/quadratic", QuadraticHandler)
 
 
 
@@ -296,9 +298,54 @@ func LongDivHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "%v\n\n:-)", result)
 }
 
+func QuadraticHandler(w http.ResponseWriter, r *http.Request) {
+
+    coeffs, ok := r.URL.Query()["a"]
+
+    if !ok || len(coeffs[0]) < 1 {
+        log.Println("Url Param 'a' is missing")
+        return
+    }
+
+    // Query()["a"] will return an array of items, 
+    // we only want the single item.
+    coeffAStr := coeffs[0]
+
+    coeffA, _ := strconv.ParseFloat(coeffAStr, 64)
+
+    coeffs, ok = r.URL.Query()["b"]
+
+    if !ok || len(coeffs[0]) < 1 {
+        log.Println("Url Param 'b' is missing")
+        return
+    }
+
+    // Query()["b"] will return an array of items, 
+    // we only want the single item.
+    coeffBStr := coeffs[0]
+
+    coeffB, _ := strconv.ParseFloat(coeffBStr, 64)
+
+    coeffs, ok = r.URL.Query()["c"]
+
+    if !ok || len(coeffs[0]) < 1 {
+        log.Println("Url Param 'c' is missing")
+        return
+    }
+
+    // Query()["c"] will return an array of items, 
+    // we only want the single item.
+    coeffCStr := coeffs[0]
+
+    coeffC, _ := strconv.ParseFloat(coeffCStr, 64)
+
+    root1, root2 := quad.Quadratic(coeffA, coeffB, coeffC)
+    result := quad.GenerateHtml(coeffA, coeffB, coeffC, root1, root2)
+
+    fmt.Fprintf(w, "%v\n\n:-)", result)
+}
+
 // Algorithm: https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication
-// TODO: Change code so first arg is the multiplier anum.
-// TODO: Stretch goal. Compute the carrys for the addition.
 func LongMult(bnum int, anum int) ([]float64, []float64, 
                                    [][]float64, [][]float64) {
 
