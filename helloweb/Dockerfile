@@ -4,6 +4,7 @@ FROM golang:1.8-alpine
 # directory.
 ADD digits    /go/src/helloweb/digits
 ADD longDiv   /go/src/helloweb/longDiv
+ADD quadratic /go/src/helloweb/quadratic
 ADD webserver /go/src/helloweb/webserver
 
 # The go install command behaves almost identically to go build, but 
@@ -19,6 +20,7 @@ ADD webserver /go/src/helloweb/webserver
 # depends on them.
 RUN go install helloweb/digits
 RUN go install helloweb/longDiv
+RUN go install helloweb/quadratic
 RUN go install helloweb/webserver 
 
 # Don't know what this line does.
