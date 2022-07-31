@@ -1,0 +1,2 @@
+The Virgin .txt transaction file (2001-2017) is a little corrupted. The transaction amount is corrupted showing chinese characters in the first part of the amount. The virgin.go program fixes it.
+More info here: https://docs.google.com/document/d/15uY9U3p0oTJrbI-tW1Pbcwnb8lHyGEZas_wh9hzwbbM/edit
