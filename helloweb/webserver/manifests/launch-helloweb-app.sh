@@ -9,13 +9,14 @@ else
   MODE=echo
 fi
 echo "This script launches the helloweb app as follows:"
-echo "   * Assumes the service, ingress and static-ip yamls are in the cwd"
+echo "   * Assumes the yamls defining the service, ingress and static-ip"
+echo "     are in the cwd"
 echo "   * Assumes the container image is built and registered in gcr.io"
 echo "     - check helloweb-deployment.yaml references the desired image"
 echo "   * https only"
 echo "   * 1 pod"
-echo "   * static ip, ensure it is conigured on your domain: alanjl.info"
-echo "You will be prompted to check your domains configuration."
+echo "   * static ip, ensure it is configured on your domain: alanjl.info"
+echo "You will be prompted to check your domain's configuration."
 echo "WARNING: The script is not designed to be idempotent."
 echo "---------------------------------------------------------------"
 echo "Running in $MODE mode. Modes: arg1 absent = echo; arg1 = mutate"
