@@ -18,6 +18,9 @@ bin/
 # Ignore files in the pkg directly, these are build results
 pkg/
 
+#Ignore local back up files like pubring.kbx~
+*~
+
 # ################## git secret #####################################
 #
 # git secret automatically adds files here that were added with
