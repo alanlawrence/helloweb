@@ -104,11 +104,11 @@ function quadratic(myA, myB, myC) {
     <h1>Enter the quadratic equation coefficients and get the roots</h1>
     <form onsubmit="quadratic(document.getElementById('coeffA').value, document.getElementById('coeffB').value, document.getElementById('coeffC').value); return false">
         <label for="coeffA"> a:</label>
-        <input type="number" id="coeffA" name="coeffA">
+        <input type="number" step="any" id="coeffA" name="coeffA">
         <label for="coeffB"> b:</label>
-        <input type="coeffB" id="coeffB" name="coeffB">
+        <input type="number" step="any" id="coeffB" name="coeffB">
         <label for="coeffC"> c:</label>
-        <input type="coeffC" id="coeffC" name="coeffC"><br><br>
+        <input type="number" step="any" id="coeffC" name="coeffC"><br><br>
         <input type="submit" value="Submit">
     </form>
     Working: <p><pre><span id="Quadratic"></span></pre></p>
