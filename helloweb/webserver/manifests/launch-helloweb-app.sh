@@ -11,7 +11,7 @@ fi
 echo "This script launches the helloweb app as follows:"
 echo "   * Assumes the yamls defining the service, ingress and static-ip"
 echo "     are in the cwd"
-echo "   * Assumes the container image is built and registered in gcr.io"
+echo "   * Assumes the container image is built and registered in a registry"
 echo "     - check helloweb-deployment.yaml references the desired image"
 echo "   * https only"
 echo "   * 1 pod"
