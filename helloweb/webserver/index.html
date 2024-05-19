@@ -3,6 +3,17 @@
 <title>Prime number?, GCD, Long multiplication and more</title>
 <iframe src='https://mars.nasa.gov/embed/25612/' width='100%' height='400'  scrolling='no' frameborder='0'></iframe>
 <script>
+function quadratic(myA, myB, myC) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("Quadratic").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET", "quadratic?a=" + myA + "&b=" + myB + "&c=" + myC, true);
+    xmlhttp.send();
+}
+
 function checkPrime(myNum) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
@@ -36,25 +47,20 @@ function longMult(myNum1, myNum2) {
     xmlhttp.send();
 }
 
+// This is the function for the last form in the list so we ensure the element
+// is scrolled into view such that the bottom of the element (the working
+// out), is aligned with the bottom of the visible area.
+// The scrollIntoView param1=false to achieve this.
 function longDiv(myDenom, myNum) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("LongDiv").innerHTML = this.responseText;
+            longDivElement = document.getElementById("LongDiv");
+            longDivElement.innerHTML = this.responseText;
+            longDivElement.scrollIntoView(false);
         }
     };
     xmlhttp.open("GET", "longdiv?denom=" + myDenom + "&num=" + myNum, true);
-    xmlhttp.send();
-}
-
-function quadratic(myA, myB, myC) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Quadratic").innerHTML = this.responseText;
-        }
-    };
-    xmlhttp.open("GET", "quadratic?a=" + myA + "&b=" + myB + "&c=" + myC, true);
     xmlhttp.send();
 }
 </script>
@@ -63,6 +69,18 @@ function quadratic(myA, myB, myC) {
 <!-- The 'return false' in the onsubmit prevents the page refreshing.
      Without it the answer flashes up briefly then the page refreshes. -->
 <body>
+    <h1>Enter the quadratic equation coefficients and get the roots</h1>
+    <form onsubmit="quadratic(document.getElementById('coeffA').value, document.getElementById('coeffB').value, document.getElementById('coeffC').value); return false">
+        <label for="coeffA"> a:</label>
+        <input type="number" step="any" id="coeffA" name="coeffA">
+        <label for="coeffB"> b:</label>
+        <input type="number" step="any" id="coeffB" name="coeffB">
+        <label for="coeffC"> c:</label>
+        <input type="number" step="any" id="coeffC" name="coeffC"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    Answer: <p><pre><span id="Quadratic"></span></pre></p>
+
     <h1>Enter a number to find out if it is prime</h1>
     <form onsubmit="checkPrime(document.getElementById('number').value); return false">
         <label for="number"> number:</label>
@@ -100,17 +118,5 @@ function quadratic(myA, myB, myC) {
         <input type="submit" value="Submit">
     </form>
     Working: <p><pre><span id="LongDiv"></span></pre></p>
-
-    <h1>Enter the quadratic equation coefficients and get the roots</h1>
-    <form onsubmit="quadratic(document.getElementById('coeffA').value, document.getElementById('coeffB').value, document.getElementById('coeffC').value); return false">
-        <label for="coeffA"> a:</label>
-        <input type="number" step="any" id="coeffA" name="coeffA">
-        <label for="coeffB"> b:</label>
-        <input type="number" step="any" id="coeffB" name="coeffB">
-        <label for="coeffC"> c:</label>
-        <input type="number" step="any" id="coeffC" name="coeffC"><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    Answer: <p><pre><span id="Quadratic"></span></pre></p>
 </body>
 </html>
