@@ -7,6 +7,9 @@ import (
     ld "helloweb/longDiv"
 )
 
+// This is a small test program which creates a standalone binary.
+// It does not itself form part of the webserver any more than
+// a *_test.go file does.
 
 // Define the cmd line arguments for this program.
 var argDenom = flag.Int("d", 12,

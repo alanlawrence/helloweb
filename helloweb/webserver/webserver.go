@@ -36,7 +36,7 @@ func main() {
     fmt.Printf("passed. Starting webserver ...\n")
 
 
-    // use PORT environPrimeHandlerment variable, or default to 8080
+    // use PORT environment variable, or default to 8080
     port := "8080"
     if fromEnv := os.Getenv("PORT"); fromEnv != "" {
         port = fromEnv
@@ -56,6 +56,7 @@ func main() {
     server.HandleFunc("/longmult", LongMultHandler)
     server.HandleFunc("/longdiv", LongDivHandler)
     server.HandleFunc("/quadratic", QuadraticHandler)
+    server.HandleFunc("/ar-series/{output}", ArSeriesHandler)
 
 
 
@@ -343,6 +344,13 @@ func QuadraticHandler(w http.ResponseWriter, r *http.Request) {
     result := quad.GenerateHtml(coeffA, coeffB, coeffC, root1, root2)
 
     fmt.Fprintf(w, "%v\n\n:-)", result)
+}
+
+func ArSeriesHandler(w http.ResponseWriter, r *http.Request) {
+
+    // Retrieve value of {output}
+    output := r.PathValue("output")
+    fmt.Fprintf(w, "Named path wildcard = %v : %v", output, "I am here!")
 }
 
 // Algorithm: https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication
