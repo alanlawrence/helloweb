@@ -22,6 +22,7 @@ import (
     "time"
     ld "helloweb/longDiv" // LongDiv produces long division working.
     quad "helloweb/quadratic" // Quadratic finds the roots.
+    series "helloweb/series" // Sum's arithmetic series etc.
 )
 
 func main() {
@@ -348,13 +349,21 @@ func QuadraticHandler(w http.ResponseWriter, r *http.Request) {
 
 func ArSeriesHandler(w http.ResponseWriter, r *http.Request) {
 
+    urlStr := r.URL.String()
     // Retrieve value of {output}
     output := r.PathValue("output")
-    fmt.Fprintf(w, "Named path wildcard = %v : %v", output, "I am here!")
+    switch output {
+    case "sum":
+       htmlStr := series.ARCalc(urlStr, r.URL.Query())
+       fmt.Fprintf(w, htmlStr)
+    default:
+        fmt.Fprintf(w, "Rest call /%v/ is not implemented :-(", output)
+        fmt.Fprintf(w, " / Found in URL %v", urlStr)
+    }
 }
 
 // Algorithm: https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication
-func LongMult(bnum int, anum int) ([]float64, []float64, 
+func LongMult(bnum int, anum int) ([]float64, []float64,
                                    [][]float64, [][]float64) {
 
     base := 10.0

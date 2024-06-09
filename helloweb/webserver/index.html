@@ -14,6 +14,18 @@ function quadratic(myA, myB, myC) {
     xmlhttp.send();
 }
 
+function arSum(myA, myD, myN) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("arSum").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET",
+                 "ar-series/sum?a=" + myA + "&d=" + myD + "&n=" + myN, true);
+    xmlhttp.send();
+}
+
 function checkPrime(myNum) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
@@ -72,6 +84,7 @@ function longDiv(myDenom, myNum) {
     <h1 id="toc">Index</h1>
     <ol>
         <li><a href="#idxQuadratic">Quadratic</a></li>
+        <li><a href="#idxARSum">Arithmetic series</a></li>
         <li><a href="#idxPrime">Prime</a></li>
         <li><a href="#idxGCD">Greatest common divisor</a></li>
         <li><a href="#idxLongMult">Long multiplication</a></li>
@@ -90,6 +103,20 @@ function longDiv(myDenom, myNum) {
         <input type="submit" value="Submit">
     </form>
     Answer: <p><pre><span id="Quadratic"></span></pre></p>
+    <p><a href="#toc">Back to index</a></p>
+
+    <h1 id="idxARSum">Enter the arithmetic series coefficients and get the
+                          sum</h1>
+    <form onsubmit="arSum(document.getElementById('coeffarA').value, document.getElementById('coeffarD').value, document.getElementById('coeffarN').value); return false">
+        <label for="coeffarA"> a:</label>
+        <input type="number" step="any" id="coeffarA" name="coeffarA">
+        <label for="coeffarD"> d:</label>
+        <input type="number" step="any" id="coeffarD" name="coeffarD">
+        <label for="coeffarN"> n:</label>
+        <input type="number" min="1" id="coeffarN" name="coeffarN"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <p>Answer: <span id="arSum"></span></p>
     <p><a href="#toc">Back to index</a></p>
 
     <h1 id="idxPrime">Enter a number to find out if it is prime</h1>
