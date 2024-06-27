@@ -16,6 +16,7 @@ echo "Example: ./build-deploy.sh 3.1"
 echo "WARNING: assumes the app has been launched with ./launch-helloweb-app.sh"
 echo "Run in same directory as the Dockerfile."
 echo "Assumes yaml in ./webserver/manifests"
+echo "Calls ./build.sh hence expects build.sh to be in the same directory."
 echo
 
 # Exit if a version has not been supplied just leaving the help screen.
@@ -23,31 +24,12 @@ if [ -z $1 ]; then exit; fi
 
 APP_NAME=hello-app
 NEW_VER=$1
-echo "New version is v$NEW_VER"
-echo
 echo "Setting up PROJECT_ID ..."
 export PROJECT_ID=alans-gcp-project
 echo "glcoud config set project id: $PROJECT_ID"
 gcloud config set project $PROJECT_ID
+./build.sh $APP_NAME $NEW_VER
 
-# We assume that the Artifact Registry repo exists, e.g. at some point in the past,
-# a creation command like this was run:
-#   gcloud artifacts repositories create helloweb-repo
-#      --repository-format=docker
-#      --location=europe
-#      --description=Repo-for-Alans-helloweb-container-images
-#
-# Repositories can be listed by running:
-#   gcloud artifacts repositories list
-#
-# And for a particular repo's images:
-#  gcloud artifacts docker images list europe-docker.pkg.dev/alans-gcp-project/helloweb-repo
-
-echo
-echo "Make sure the registry is populated with our container image."
-echo "Running docker build and push commands for europe-docker.pkg.dev/${PROJECT_ID}/$APP_NAME:v$NEW_VER"
-docker build -t europe-docker.pkg.dev/${PROJECT_ID}/helloweb-repo/$APP_NAME:v$NEW_VER .
-docker push europe-docker.pkg.dev/${PROJECT_ID}/helloweb-repo/$APP_NAME:v$NEW_VER
 echo
 echo "Now edit the deployment yaml file ..."
 cd webserver/manifests

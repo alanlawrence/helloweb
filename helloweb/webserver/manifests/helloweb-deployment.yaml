@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: hello-app
-        image: europe-docker.pkg.dev/alans-gcp-project/helloweb-repo/hello-app:v3.3.2
+        image: europe-docker.pkg.dev/alans-gcp-project/helloweb-repo/hello-app:v3.4.0
         ports:
         - containerPort: 8080
