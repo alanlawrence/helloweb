@@ -21,8 +21,8 @@ echo "env project id: $PROJECT_ID"
 echo "glcoud config project id: "
 gcloud config get project
 
-# We assume that the Artifact Registry repo exists, e.g. at some point in the past,
-# a creation command like this was run:
+# We assume that the Artifact Registry repo exists, e.g. at some point in the
+# past, a creation command like this was run:
 #   gcloud artifacts repositories create helloweb-repo
 #      --repository-format=docker
 #      --location=europe
@@ -31,8 +31,9 @@ gcloud config get project
 # Repositories can be listed by running:
 #   gcloud artifacts repositories list
 #
-# And for a particular repo's images:
-#  gcloud artifacts docker images list europe-docker.pkg.dev/alans-gcp-project/helloweb-repo
+# And for a particular repo's images with versions and most recently
+# updated first:
+# gcloud artifacts docker images list europe-docker.pkg.dev/alans-gcp-project/helloweb-repo/hello-app --include-tags --sort-by="~update_time" --format="table(package:label=IMAGE, version:label=DIGEST, tags:label=VERSION, metadata.imageSizeBytes.size():label=SIZE, create_time:label=CREATE, update_time:label=UPDATED)"
 
 echo
 echo "Make sure the registry is populated with our container image."

@@ -1,4 +1,4 @@
-FROM golang:1.22.4-alpine AS build-stage
+FROM golang:1.26-alpine AS build-stage
 # The FROM setting sets the base image used for the following commands.
 # We are using an alpine base image with go version indicated installed.
 # Alpine is small and fast. See the tags for available images here:
@@ -26,6 +26,7 @@ ADD go.mod    /go/src/helloweb/go.mod
 RUN echo $(go env) # debug
 RUN echo $(pwd)    # debug
 WORKDIR /go/src/helloweb
+RUN go test -v ./...
 RUN go install helloweb/webserver
 
 # Now switch the image to the one we want to run in. The last image
@@ -46,7 +47,7 @@ RUN mkdir webserver
 COPY --from=build-stage /go/bin/webserver webserver/.
 COPY --from=build-stage /go/src/helloweb/webserver/index.html webserver/.
 RUN echo $(ls /webserver/.) # debug
-ENV PORT 8080
+ENV PORT=8080
 
 # CMD defines the command that the container executes by default.
 # We run the webserver from its location "/webserver" which we set as

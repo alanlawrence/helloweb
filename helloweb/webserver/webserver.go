@@ -27,13 +27,11 @@ import (
 
 func main() {
 
-    // Test functions and don't run the webserver if the tests fail.
-    fmt.Printf("Running self tests ... ")
+    // Test a function and don't run the webserver if the test fails.
+    fmt.Printf("Running self test ... ")
     if !TestIsPrime() {
         os.Exit(1)
     }
-    // TODO: what about the other self test functions?
-    //     : those in packages are tested with "go test <package>"
     fmt.Printf("passed. Starting webserver ...\n")
 
 
@@ -71,8 +69,8 @@ func main() {
 func hello(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("Serving request: %s", r.URL.Path)
     host, _ := os.Hostname()
-    fmt.Fprintf(w, "Hello, GKE!\n")
-    fmt.Fprintf(w, "Version: 3.1.0\n")
+    fmt.Fprintf(w, "Hello, web!\n")
+    fmt.Fprintf(w, "Version: 3.4.1\n")
     fmt.Fprintf(w, "Hostname: %s\n", host)
     fmt.Fprintf(w, "Private message: Daddy loves you Pops!\n")
     fmt.Fprintf(w, "Time: %v\n", time.Now())
@@ -355,7 +353,7 @@ func ArSeriesHandler(w http.ResponseWriter, r *http.Request) {
     switch output {
     case "sum":
        htmlStr := series.ARCalc(urlStr, r.URL.Query())
-       fmt.Fprintf(w, htmlStr)
+       fmt.Fprintf(w, "%v\n\n:-)", htmlStr)
     default:
         fmt.Fprintf(w, "Rest call /%v/ is not implemented :-(", output)
         fmt.Fprintf(w, " / Found in URL %v", urlStr)

@@ -1,0 +1,21 @@
+echo "---------------------------------------------------"
+echo "This script configures gcloud for alans-gcp-project"
+echo
+echo "Sets the gcloud project and exports it as an env var"
+echo "called PROJECT_ID"
+echo
+echo "Run with:"
+echo "    source <this source file name>"
+echo "E.g."
+echo "    source ${BASH_SOURCE[0]}"
+echo "---------------------------------------------------"
+echo
+
+# Set
+export PROJECT_ID=alans-gcp-project
+gcloud config set project $PROJECT_ID
+
+# Get
+echo "PROJECT_ID = $PROJECT_ID"
+echo -n "gcloud project = "
+gcloud config get project

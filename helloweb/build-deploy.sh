@@ -28,6 +28,7 @@ echo "Setting up PROJECT_ID ..."
 export PROJECT_ID=alans-gcp-project
 echo "glcoud config set project id: $PROJECT_ID"
 gcloud config set project $PROJECT_ID
+echo "Invoking script to build and push container to artefact registry ..."
 ./build.sh $APP_NAME $NEW_VER
 
 echo
