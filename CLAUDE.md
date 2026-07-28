@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project is
 
-A Go web server that serves an interactive maths calculator. The browser sends AJAX requests to the server, which computes results and returns HTML fragments that are injected into the page without a reload. Deployed to GKE (Google Kubernetes Engine) via Docker. More recently deployed to Google Serverless Cloud Run manually from Google Artefact Registry from location europe-docker.pkg.dev/alans-gcp-project/helloweb-repo.
+A Go web server that serves an interactive maths calculator. The browser sends AJAX requests to the server, which computes results and returns HTML fragments that are injected into the page without a reload. Previously deployed to GKE (Google Kubernetes Engine) via Docker. More recently deployed to Google Serverless Cloud Run via a container image registered to Google Artefact Registry from location europe-docker.pkg.dev/alans-gcp-project/helloweb-repo.
 
 ## Commands
 
@@ -36,8 +36,7 @@ go test helloweb/series -run TestARCalc
 
 **Build and push Docker image** (run from `helloweb/`):
 ```bash
-export PROJECT_ID=alans-gcp-project
-./build-deploy.sh <version>            # build + push + kubectl apply
+./build.sh hello-app <version>         # build + optional push to Google Artifact Registry
 ```
 
 **Deploy to Cloud Run**
@@ -47,7 +46,8 @@ export PROJECT_ID=alans-gcp-project
 
 **Build, push Docker Image, and deploy to GKE** (after first-time setup):
 ```bash
-./build.sh hello-app <version>         # build + optional push to Google Artifact Registry
+export PROJECT_ID=alans-gcp-project
+./build-deploy.sh <version>            # build + push + kubectl apply
 ```
 
 **Deploy to GKE** (first-time setup):
@@ -60,17 +60,17 @@ cd helloweb/webserver/manifests
 
 ```
 helloweb/
-├── go.mod                      # module: helloweb, go 1.22
+├── go.mod                      # module: helloweb, go 1.26
 ├── Dockerfile                  # multi-stage: golang:alpine build → alpine run
 ├── webserver/
-│   ├── webserver.go            # main: HTTP router + inline prime/GCD/longmult logic
+│   ├── webserver.go            # main: HTTP router + inline prime and GCD logic; longmult and division logic included via main package
 │   └── index.html              # single-page UI; AJAX calls hit the API endpoints
 ├── series/series.go            # arithmetic series sum: S = n/2 * (2a + (n-1)d)
 ├── quadratic/quadratic.go      # quadratic formula, real and complex roots
 ├── longDiv/longDiv.go          # long division with step-by-step working
 ├── digits/digits.go            # Digits struct: digit-level manipulation of integers
-├── longmult/longmult.go        # long multiplication package (logic also inline in main)
-└── division/division.go        # division utilities
+├── longmult/longmult.go        # long multiplication package (included in main package)
+└── division/division.go        # division utilities package (included in main package)
 ```
 
 **Request flow:** `index.html` → AJAX `XMLHttpRequest` → Go handler in `webserver.go` → package function → HTML fragment string → response body → injected into `<span>` in page.
