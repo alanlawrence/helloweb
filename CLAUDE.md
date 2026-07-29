@@ -16,6 +16,28 @@ go run helloweb/webserver
 ```
 The server starts on port 8080 (or `$PORT`). It runs self-tests for `IsPrime` at startup and exits if they fail. View in a browser by visiting localhost:8080 (or localhost:$PORT). To run the webserver in the background, add a trailing &.
 
+**Lint:**
+```bash
+go vet ./...
+```
+
+**Formatting:**
+Use 4 spaces for indentions, not tabs.
+
+
+**Test Driven Development:**
+Write enough function code for tests to compile.
+Write the tests.
+Write the remaining code so that the tests pass.
+
+
+**Design Philosophy:**
+Simple to maintain UI, fast to load and process.
+Using HTML without styling and minimal third party javascript packages allows fast loading and simple dependency management.
+Injecting HTML response fragments into the DOM which are formatted as plain text ensures super fast update responses.
+Using the minimal Alpine container image allows fast cold startups.
+
+
 **Run all tests in verbose mode:**
 ```bash
 go test -v ./...
