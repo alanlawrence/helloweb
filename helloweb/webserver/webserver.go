@@ -44,9 +44,12 @@ func main() {
     // register hello function to handle all requests
     server := http.NewServeMux()
 
-    // The default page is served from the local directory.
+    server.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "index.html")
+    })
+
     server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        http.ServeFile(w, r, r.URL.Path[1:])
+        http.NotFound(w, r)
     })
 
     server.HandleFunc("/hello", hello)
