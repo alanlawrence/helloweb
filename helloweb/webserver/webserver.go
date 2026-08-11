@@ -44,10 +44,11 @@ func main() {
     // register hello function to handle all requests
     server := http.NewServeMux()
 
-    server.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
-        http.ServeFile(w, r, "index.html")
-    })
+    server.HandleFunc("/{$}", RootHandler)
 
+    // Explicit catch-all for unmatched paths (e.g. probes from cyber attackers).
+    // Keeping this as our own handler, rather than relying on ServeMux's
+    // default 404, gives us a place to add logging/metrics on these later.
     server.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         http.NotFound(w, r)
     })
@@ -66,6 +67,25 @@ func main() {
     fmt.Printf("Server listening on port %s\n", port)
     err := http.ListenAndServe(":"+port, server)
     log.Fatal(err)
+}
+
+// RootHandler serves index.html for exact GET requests to "/" with no
+// query parameters. Anything else (other methods, or GET with query
+// parameters) is rejected immediately, since these are the kinds of
+// requests attackers probe with.
+func RootHandler(w http.ResponseWriter, r *http.Request) {
+
+    if r.Method != http.MethodGet {
+        http.Error(w, fmt.Sprintf("Method %s not allowed", r.Method), http.StatusMethodNotAllowed)
+        return
+    }
+
+    if len(r.URL.Query()) > 0 {
+        http.NotFound(w, r)
+        return
+    }
+
+    http.ServeFile(w, r, "index.html")
 }
 
 // hello responds to the request with a plain-text "Hello, world" message.
