@@ -10,6 +10,8 @@ import (
 // Globals
 var DEBUG = false
 
+const invalidInputMsg = "Only positive integers are valid inputs"
+
 
 // Notes:
 // Separates out interim quotient from quotient
@@ -201,6 +203,17 @@ func GenerateHtml(digitsD d.Digits, quotient d.Digits,
         }
     }
     return htmlStr
+}
+
+// CalculateHtml validates denom and num are positive integers, then
+// returns the long division working as an HTML fragment. If either input
+// is invalid (a decimal, zero, or negative) it returns an HTML fragment
+// containing an error message instead of performing the calculation.
+func CalculateHtml(denom float64, num float64) string {
+    if !d.IsPositiveInteger(denom) || !d.IsPositiveInteger(num) {
+        return invalidInputMsg
+    }
+    return GenerateHtml(LongDiv(int(denom), int(num)))
 }
 
 func SelfTest() (bool) {

@@ -1,15 +1,17 @@
-package main
+package longmult
 
 import (
     "fmt"
     "math"
+    d "helloweb/digits"
 )
 
+const invalidInputMsg = "Only positive integers are valid inputs"
 
 // Algorithm: https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication
 // TODO: Change code so first arg is the multiplier anum.
 // TODO: Stretch goal. Compute the carrys for the addition.
-func LongMult(bnum int, anum int) ([]float64, []float64, 
+func LongMult(bnum int, anum int) ([]float64, []float64,
                                    [][]float64, [][]float64) {
 
     base := 10.0
@@ -42,7 +44,7 @@ func LongMult(bnum int, anum int) ([]float64, []float64,
     for ri := range product {
         product[ri] = make([]float64, lenA + lenB)
     }
-    //An array to store the mulitplication carries. 
+    //An array to store the mulitplication carries.
     //Not necessary for the calculation
     //but required in long multiplication working.
     carrys := make([][]float64, lenB)
@@ -126,6 +128,66 @@ func PrintWorking(digitsA []float64, digitsB []float64,
     fmt.Printf("\n");
 }
 
-func main() {
-    PrintWorking(LongMult(24, 418))
+func GenerateHtml(digitsA []float64, digitsB []float64,
+                  product [][]float64, carrys [][]float64) string {
+
+    workingStr := fmt.Sprintf("")
+    lenS := len(digitsA) - len(digitsB)
+    for si := 0; si < -1 * lenS; si++ {
+        workingStr += fmt.Sprintf("  ")
+    }
+    workingStr += fmt.Sprintf("            %v<br>", digitsA)
+    for si := 0; si < lenS; si++ {
+        workingStr += fmt.Sprintf("  ")
+    }
+    workingStr += fmt.Sprintf("          x %v<br><br>", digitsB)
+    lenP := len(product)
+    printZeroes := false
+    for ri := lenP - 2 ; ri >= 0; ri-- {
+        workingStr += fmt.Sprintf("          ")
+        printZeroes = false
+        for _, digitP := range product[ri] {
+            if digitP == 0 && !printZeroes {
+                workingStr += fmt.Sprintf("  ")
+            } else {
+                workingStr += fmt.Sprintf("%v ", digitP)
+                printZeroes = true
+            }
+        }
+        workingStr += fmt.Sprintf("<br>");
+        workingStr += fmt.Sprintf("carry-> ")
+        for _, digitC := range carrys[ri] {
+            if digitC == 0 {
+                workingStr += fmt.Sprintf("  ")
+            } else {
+                workingStr += fmt.Sprintf("%v ", digitC)
+            }
+        }
+        workingStr += fmt.Sprintf("<br>");
+    }
+    workingStr += fmt.Sprintf("Total     ")
+    printZeroes = false
+    for _, digitT := range product[lenP-1] {
+        if digitT == 0 && !printZeroes {
+            workingStr += fmt.Sprintf("  ")
+        } else {
+            workingStr += fmt.Sprintf("%v ", digitT)
+            printZeroes = true
+        }
+    }
+    workingStr += fmt.Sprintf("<br>");
+
+    return workingStr
+}
+
+// CalculateHtml validates anum and bnum are positive integers, then
+// returns the long multiplication working as an HTML fragment. If either
+// input is invalid (a decimal, zero, or negative) it returns an HTML
+// fragment containing an error message instead of performing the
+// calculation.
+func CalculateHtml(anum float64, bnum float64) string {
+    if !d.IsPositiveInteger(anum) || !d.IsPositiveInteger(bnum) {
+        return invalidInputMsg
+    }
+    return GenerateHtml(LongMult(int(bnum), int(anum)))
 }

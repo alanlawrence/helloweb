@@ -133,6 +133,28 @@ func TestLen(t *testing.T) {
     }
 }
 
+func TestIsPositiveInteger(t *testing.T) {
+    cases := []struct {
+        name  string
+        input float64
+        want  bool
+    }{
+        {"positive integer", 5, true},
+        {"positive integer with decimal representation", 12.0, true},
+        {"decimal", 5.5, false},
+        {"zero", 0, false},
+        {"negative integer", -5, false},
+        {"negative decimal", -5.5, false},
+    }
+    for _, c := range cases {
+        got := IsPositiveInteger(c.input)
+        if got != c.want {
+            t.Errorf("%v: IsPositiveInteger(%v) = %v, want %v",
+                                c.name,      c.input,  got,   c.want)
+        }
+    }
+}
+
 func TestCompare(t *testing.T) {
     var d, d2 Digits
     d.Init(1234)

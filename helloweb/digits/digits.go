@@ -112,6 +112,14 @@ func (d *Digits) PartN(j int) (partN float64) {
     return partN
 }
 
+// IsPositiveInteger reports whether x is a whole number greater than zero.
+// Used to validate user-supplied numbers before they are truncated to int
+// for use in long multiplication and long division.
+func IsPositiveInteger(x float64) (result bool) {
+    result = x > 0 && x == math.Trunc(x)
+    return result
+}
+
 // Returns the number of digits.
 func (d *Digits) Len() (lend int) {
     lend = len(d.digits)
