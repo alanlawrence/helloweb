@@ -9,6 +9,7 @@ FROM golang:1.26-alpine AS build-stage
 # directory.
 ADD digits    /go/src/helloweb/digits
 ADD longDiv   /go/src/helloweb/longDiv
+ADD longmult  /go/src/helloweb/longmult
 ADD quadratic /go/src/helloweb/quadratic
 ADD series    /go/src/helloweb/series
 ADD webserver /go/src/helloweb/webserver
