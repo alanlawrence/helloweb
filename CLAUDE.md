@@ -23,6 +23,7 @@ go vet ./...
 
 **Formatting:**
 Use 4 spaces for indentions, not tabs.
+Try to limit to 80 character width lines where possible to make editing via Vim easier.
 
 
 **Test Driven Development:**
