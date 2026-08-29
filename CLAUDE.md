@@ -87,7 +87,7 @@ helloweb/
 ├── Dockerfile                  # multi-stage: golang:alpine build → alpine run
 ├── webserver/
 │   ├── webserver.go            # main: HTTP router + inline prime and GCD logic; longmult and division logic included via main package
-│   └── index.html              # single-page UI; AJAX calls hit the API endpoints
+│   └── index.html              # single-page UI; embedded into the binary via //go:embed, served from memory by RootHandler
 ├── series/series.go            # arithmetic series sum: S = n/2 * (2a + (n-1)d)
 ├── quadratic/quadratic.go      # quadratic formula, real and complex roots
 ├── longDiv/longDiv.go          # long division with step-by-step working
@@ -99,6 +99,8 @@ helloweb/
 **Request flow:** `index.html` → AJAX `XMLHttpRequest` → Go handler in `webserver.go` → package function → HTML fragment string → response body → injected into `<span>` in page.
 
 Each endpoint reads URL query params, calls a computation function, and returns an HTML fragment. Every package that generates output has a paired `GenerateHtml()` function.
+
+**Root URL:** `index.html` is embedded at build time (`//go:embed` in `webserver.go`). `RootHandler` writes it straight from memory with precomputed `Content-Type`/`Content-Length` headers — no disk I/O, no content sniffing, no range/conditional handling. The file no longer needs to be present in the working directory at runtime, and the Docker runtime image does not copy it. Edits to `index.html` only take effect after a rebuild.
 
 **Two testing approaches coexist:**
 - `IsPrime` has an inline `TestIsPrime()` called from `main()` at startup (process exits on failure).

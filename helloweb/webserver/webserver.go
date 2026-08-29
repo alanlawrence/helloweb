@@ -13,6 +13,7 @@
 package main
 
 import (
+    _ "embed" // Enables the //go:embed directive for indexHTML.
     "fmt"
     "log"
     "math"
@@ -26,11 +27,32 @@ import (
     series "helloweb/series" // Sum's arithmetic series etc.
 )
 
+// index.html is embedded into the binary at build time so that root URL
+// requests never read from disk and don't depend on the process working
+// directory. Edits to the file take effect only after a rebuild.
+// The line below is an ordinary Go comment syntactically, but the build
+// toolchain also reads it as a directive: it copies the contents of
+// index.html into the variable declared immediately after it.
+//go:embed index.html
+var indexHTML []byte
+
+// Content type is hard-coded rather than sniffed per request.
+const indexContentType = "text/html; charset=utf-8"
+
+// indexContentLength is precomputed once so RootHandler does no per-request
+// work to set the header. Setting it explicitly also stops net/http from
+// falling back to chunked transfer encoding for this response.
+var indexContentLength = strconv.Itoa(len(indexHTML))
+
 func main() {
 
     // Test a function and don't run the webserver if the test fails.
     fmt.Printf("Running self test ... ")
     if !TestIsPrime() {
+        os.Exit(1)
+    }
+    if len(indexHTML) == 0 {
+        log.Printf("FAIL: embedded index.html is empty\n")
         os.Exit(1)
     }
     fmt.Printf("passed. Starting webserver ...\n")
@@ -70,10 +92,14 @@ func main() {
     log.Fatal(err)
 }
 
-// RootHandler serves index.html for exact GET requests to "/" with no
-// query parameters. Anything else (other methods, or GET with query
+// RootHandler serves the embedded index.html for exact GET requests to "/"
+// with no query parameters. Anything else (other methods, or GET with query
 // parameters) is rejected immediately, since these are the kinds of
 // requests attackers probe with.
+//
+// The response is written straight from memory with precomputed headers: no
+// disk I/O, no content sniffing, no conditional/range negotiation. This is
+// the leanest path we can offer on what is a common attack-probe endpoint.
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 
     if r.Method != http.MethodGet {
@@ -86,7 +112,10 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    http.ServeFile(w, r, "index.html")
+    h := w.Header()
+    h["Content-Type"] = []string{indexContentType}
+    h["Content-Length"] = []string{indexContentLength}
+    w.Write(indexHTML)
 }
 
 // hello responds to the request with a plain-text "Hello, world" message.

@@ -39,20 +39,18 @@ RUN go install helloweb/webserver
 FROM alpine:latest AS target-image
 
 # We copy our binary /go/bin/webserver to "/webserver".
-# And we copy our index.html file to the same directory
-# since webserver expects it to be in its working dir.
+# index.html is embedded into the binary (see //go:embed in webserver.go),
+# so the runtime image no longer needs a copy of it on disk.
 # The '--from=build-stage' means take the files from the
 # first FROM statement image that we labeled as build-stage
 # above.
 RUN mkdir webserver
 COPY --from=build-stage /go/bin/webserver webserver/.
-COPY --from=build-stage /go/src/helloweb/webserver/index.html webserver/.
 RUN echo $(ls /webserver/.) # debug
 ENV PORT=8080
 
 # CMD defines the command that the container executes by default.
-# We run the webserver from its location "/webserver" which we set as
-# the working dir so it can read the index.html file there.
+# We run the webserver from its location "/webserver".
 WORKDIR /webserver
 RUN echo $(ls .) # debug
 RUN echo $(pwd)  # debug
