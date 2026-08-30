@@ -11,6 +11,12 @@ import (
 // It does not itself form part of the webserver any more than
 // a *_test.go file does.
 
+// Run it by running the following command in the local directory
+// containing this file, e.g.
+//
+//     go run ./division.go
+//
+
 // Define the cmd line arguments for this program.
 var argDenom = flag.Int("d", 12,
                 "d=<denominator> e.g. d=12, must be a +ve integer")

@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Go web server that serves an interactive maths calculator. The browser sends AJAX requests to the server, which computes results and returns HTML fragments that are injected into the page without a reload. Previously deployed to GKE (Google Kubernetes Engine) via Docker. More recently deployed to Google Serverless Cloud Run via a container image registered to Google Artefact Registry from location europe-docker.pkg.dev/alans-gcp-project/helloweb-repo.
 
+## Definition of done
+
+1. Never consider a task done until the full test suite passes.
+1. New or modified golang code is 100% executed by automated tests which
+   are either already a part of the full test suite or have been added.
+1. The acceptance criteria on the GitHub issue being addressed are satisfied.
+1. Changes are committed and the GitHub issue updated with a change and test
+   result summary.
+
 ## Commands
 
 All commands run from `helloweb/` (the directory containing `go.mod` and `Dockerfile`).
@@ -48,6 +57,7 @@ go test -v ./...
 ```bash
 go test helloweb/series
 go test helloweb/longDiv
+go test helloweb/longmult
 go test helloweb/quadratic
 go test helloweb/digits
 ```
