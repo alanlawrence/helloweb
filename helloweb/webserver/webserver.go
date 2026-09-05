@@ -52,12 +52,13 @@ func main() {
         os.Exit(1)
     }
 
-
     // use PORT environment variable, or default to 8080
     port := "8080"
     if fromEnv := os.Getenv("PORT"); fromEnv != "" {
         port = fromEnv
     }
+
+    log.Println("Webserver is starting ...")
 
     // register hello function to handle all requests
     server := http.NewServeMux()

@@ -73,7 +73,9 @@ func GenerateHtml(number int64, isPrime bool) string {
 // that isn't a positive integer (malformed input, negative, or zero)
 // returns an HTML fragment containing an error message instead.
 func CalculateHtml(numberStr string) string {
-    number, err := strconv.ParseInt(numberStr, 10, 64)
+    const base int = 10
+    const bitSize int = 64
+    number, err := strconv.ParseInt(numberStr, base, bitSize)
     if err != nil {
         numErr, ok := err.(*strconv.NumError)
         if !ok || numErr.Err != strconv.ErrRange {
