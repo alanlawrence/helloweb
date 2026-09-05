@@ -23,7 +23,7 @@ All commands run from `helloweb/` (the directory containing `go.mod` and `Docker
 ```bash
 go run helloweb/webserver
 ```
-The server starts on port 8080 (or `$PORT`). It runs self-tests for `IsPrime` at startup and exits if they fail. View in a browser by visiting localhost:8080 (or localhost:$PORT). To run the webserver in the background, add a trailing &.
+The server starts on port 8080 (or `$PORT`). View in a browser by visiting localhost:8080 (or localhost:$PORT). To run the webserver in the background, add a trailing &.
 
 **Lint:**
 ```bash
@@ -60,6 +60,7 @@ go test helloweb/longDiv
 go test helloweb/longmult
 go test helloweb/quadratic
 go test helloweb/digits
+go test helloweb/prime
 ```
 
 **Run a single test:**
@@ -96,13 +97,14 @@ helloweb/
 ├── go.mod                      # module: helloweb, go 1.26
 ├── Dockerfile                  # multi-stage: golang:alpine build → alpine run
 ├── webserver/
-│   ├── webserver.go            # main: HTTP router + inline prime and GCD logic; longmult and division logic included via main package
+│   ├── webserver.go            # main: HTTP router + inline GCD logic; longmult and division logic included via main package
 │   └── index.html              # single-page UI; embedded into the binary via //go:embed, served from memory by RootHandler
 ├── series/series.go            # arithmetic series sum: S = n/2 * (2a + (n-1)d)
 ├── quadratic/quadratic.go      # quadratic formula, real and complex roots
 ├── longDiv/longDiv.go          # long division with step-by-step working
 ├── digits/digits.go            # Digits struct: digit-level manipulation of integers
 ├── longmult/longmult.go        # long multiplication package (included in main package)
+├── prime/prime.go              # primality testing package
 └── division/division.go        # division utilities package (included in main package)
 ```
 
@@ -111,10 +113,6 @@ helloweb/
 Each endpoint reads URL query params, calls a computation function, and returns an HTML fragment. Every package that generates output has a paired `GenerateHtml()` function.
 
 **Root URL:** `index.html` is embedded at build time (`//go:embed` in `webserver.go`). `RootHandler` writes it straight from memory with precomputed `Content-Type`/`Content-Length` headers — no disk I/O, no content sniffing, no range/conditional handling. The file no longer needs to be present in the working directory at runtime, and the Docker runtime image does not copy it. Edits to `index.html` only take effect after a rebuild.
-
-**Two testing approaches coexist:**
-- `IsPrime` has an inline `TestIsPrime()` called from `main()` at startup (process exits on failure).
-- All packages use standard `go test` with `_test.go` files.
 
 **`digits.Digits`** is a shared struct used by `longDiv` to represent numbers as digit slices, enabling the step-by-step working display (each intermediate row in the long division layout is a `Digits` value).
 

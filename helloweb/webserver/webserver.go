@@ -23,6 +23,7 @@ import (
     "time"
     ld "helloweb/longDiv" // LongDiv produces long division working.
     lm "helloweb/longmult" // LongMult produces long multiplication working.
+    "helloweb/prime" // Prime tests for primality.
     quad "helloweb/quadratic" // Quadratic finds the roots.
     series "helloweb/series" // Sum's arithmetic series etc.
 )
@@ -46,16 +47,10 @@ var indexContentLength = strconv.Itoa(len(indexHTML))
 
 func main() {
 
-    // Test a function and don't run the webserver if the test fails.
-    fmt.Printf("Running self test ... ")
-    if !TestIsPrime() {
-        os.Exit(1)
-    }
     if len(indexHTML) == 0 {
         log.Printf("FAIL: embedded index.html is empty\n")
         os.Exit(1)
     }
-    fmt.Printf("passed. Starting webserver ...\n")
 
 
     // use PORT environment variable, or default to 8080
@@ -138,103 +133,11 @@ func PrimeHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Query()["number"] will return an array of items, 
+    // Query()["number"] will return an array of items,
     // we only want the single item.
     numberStr := numbers[0]
 
-    number, _ := strconv.Atoi(numberStr)
-
-    result := ""
-    if IsPrime(number) {
-        result = "is prime!"
-    } else {
-        result = "is not prime :-("
-    }
-
-    fmt.Fprintf(w, "%v %v", number, result)
-}
-
-// TODO: Move IsPrime and its test driver out into another package.
-func IsPrime(n int) bool {
-
-    isPrime := true
-    done := false
-    if n <= 3 {
-        isPrime = n >= 1
-        done = true
-    } else if (n % 2 == 0 || n % 3 == 0) {
-        isPrime = false
-        done = true
-    }
-
-    // All the numbers below 25 are either divisible by 2 or 3 (tested above)
-    // or are prime.
-    if (!done && n < 25) {
-        isPrime = true
-        done = true
-    }
-
-    // Now exploit the property that all primes >=6 are of the form 6k+1 or 6k-1
-    // since 2 divides 6k, 6k+2 and 6k+4, and 3 divides 6k+3
-    // which leaves 6k+1 and 6k+5 (== 6k'-1, where k'=k+1).
-
-    // So we test all numbers of the form 6k+/-1 such that
-    //     6k+/-1     <= sqrt(n)
-    // ==> (6k+/-1)^2 <= n
-
-    i := 5
-    // This generates the pair 5 and 7 for the first iteration, k = 1
-    for (!done && i*i <= n) {
-
-        if n % i == 0 {
-            isPrime = false
-            done = true
-        } else if n % (i+2) == 0 {
-            isPrime = false
-            done = true
-        }
-        // Advance to next iteration. Imagine k += 1
-        i += 6
-    }
-    // else must be prime hence return isPrime default of true.
-
-    return isPrime
-}
-
-func TestIsPrime() bool {
-
-    pass := 0
-    tests := 0
-    if IsPrime(1) && IsPrime(2) && IsPrime(3) && IsPrime(5) && IsPrime(7) && IsPrime(11) {
-        pass += 6
-    } else {
-        log.Printf("FAIL: isPrime returned false for a prime\n")
-    }
-    tests += 6
-
-    if !(IsPrime(4) || IsPrime(6) || IsPrime(8) || IsPrime(9) || IsPrime(10)) {
-        pass += 5
-    } else {
-        log.Printf("FAIL: isPrime returned true for a non-prime\n")
-    }
-    tests += 5
-
-    // Test some larger numbers to exercise the k+/-1 loop.
-    if IsPrime(23) && IsPrime(29) && IsPrime(37) && IsPrime(97) && IsPrime(107) {
-        pass += 5
-    } else {
-        log.Printf("FAIL: isPrime returned false for a prime\n")
-    }
-    tests += 5
-
-    if !(IsPrime(24) || IsPrime(25) || IsPrime(38) || IsPrime(99) || IsPrime(115)) {
-        pass += 5
-    } else {
-        log.Printf("FAIL: isPrime returned true for a non-prime\n")
-    }
-    tests += 5
-
-    return pass == tests
+    fmt.Fprintf(w, "%v", prime.CalculateHtml(numberStr))
 }
 
 func GcdHandler(w http.ResponseWriter, r *http.Request) {

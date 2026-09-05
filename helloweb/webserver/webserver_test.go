@@ -2,17 +2,42 @@ package main
 
 import (
     "bytes"
+    "io"
     "net/http"
     "net/http/httptest"
     "os"
     "testing"
 )
 
-// Provide a test function so this package won't cause an error when
-// go test ./... is run from the build root directory.
-func TestPrime(t *testing.T) {
-    if TestIsPrime() != true {
-        t.Errorf("Expected true but got /%v/", false)
+// TestPrimeHandler covers the /prime endpoint's query-param wiring;
+// primality logic itself is covered by helloweb/prime's tests.
+func TestPrimeHandler(t *testing.T) {
+    tests := []struct {
+        name   string
+        target string
+        want   string
+    }{
+        {"valid prime", "/prime?number=13", "13 is prime!"},
+        {"valid composite", "/prime?number=4", "4 is not prime :-("},
+        {"zero is invalid", "/prime?number=0", "Only positive integers are valid inputs"},
+        {"negative is invalid", "/prime?number=-5", "Only positive integers are valid inputs"},
+    }
+
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            req := httptest.NewRequest(http.MethodGet, tc.target, nil)
+            rec := httptest.NewRecorder()
+
+            PrimeHandler(rec, req)
+
+            body, err := io.ReadAll(rec.Result().Body)
+            if err != nil {
+                t.Fatalf("reading response body: %v", err)
+            }
+            if got := string(body); got != tc.want {
+                t.Errorf("PrimeHandler(%s) body = %q, want %q", tc.target, got, tc.want)
+            }
+        })
     }
 }
 
