@@ -10,6 +10,7 @@ FROM golang:1.26-alpine AS build-stage
 ADD digits    /go/src/helloweb/digits
 ADD longDiv   /go/src/helloweb/longDiv
 ADD longmult  /go/src/helloweb/longmult
+ADD prime     /go/src/helloweb/prime
 ADD quadratic /go/src/helloweb/quadratic
 ADD series    /go/src/helloweb/series
 ADD webserver /go/src/helloweb/webserver
