@@ -4,56 +4,87 @@ package prime
 
 import (
     "fmt"
+    "math/bits"
     "strconv"
 )
 
 const invalidInputMsg = "Only positive integers are valid inputs"
 
-// IsPrime reports whether n is a prime number.
-func IsPrime(n int64) bool {
+// Bases forming a deterministic Miller-Rabin witness set for every
+// n < 2^64. See https://miller-rabin.appspot.com/ for the derivation.
+var millerRabinBases = []uint64{2, 325, 9375, 28178, 450775, 9780504, 1795265022}
 
-    isPrime := true
-    done := false
-    if n <= 3 {
-        isPrime = n >= 1
-        done = true
-    } else if (n % 2 == 0 || n % 3 == 0) {
-        isPrime = false
-        done = true
-    }
+// modMul calculates (a * b) % mod without 64-bit overflow, using the
+// full 128-bit product.
+func modMul(a, b, mod uint64) uint64 {
+    hi, lo := bits.Mul64(a, b)
+    _, rem := bits.Div64(hi, lo, mod)
+    return rem
+}
 
-    // All the numbers below 25 are either divisible by 2 or 3 (tested above)
-    // or are prime.
-    if (!done && n < 25) {
-        isPrime = true
-        done = true
-    }
-
-    // Now exploit the property that all primes >=6 are of the form 6k+1 or 6k-1
-    // since 2 divides 6k, 6k+2 and 6k+4, and 3 divides 6k+3
-    // which leaves 6k+1 and 6k+5 (== 6k'-1, where k'=k+1).
-
-    // So we test all numbers of the form 6k+/-1 such that
-    //     6k+/-1     <= sqrt(n)
-    // ==> (6k+/-1)^2 <= n
-
-    i := int64(5)
-    // This generates the pair 5 and 7 for the first iteration, k = 1
-    for (!done && i*i <= n) {
-
-        if n % i == 0 {
-            isPrime = false
-            done = true
-        } else if n % (i+2) == 0 {
-            isPrime = false
-            done = true
+// modPow calculates (base^exp) % mod.
+func modPow(base, exp, mod uint64) uint64 {
+    result := uint64(1)
+    base = base % mod
+    for exp > 0 {
+        if exp&1 == 1 {
+            result = modMul(result, base, mod)
         }
-        // Advance to next iteration. Imagine k += 1
-        i += 6
+        base = modMul(base, base, mod)
+        exp >>= 1
     }
-    // else must be prime hence return isPrime default of true.
+    return result
+}
 
-    return isPrime
+// IsPrime reports whether n is a prime number, using the deterministic
+// Miller-Rabin test with a fixed witness set valid for all n < 2^64.
+func IsPrime(n int64) bool {
+    if n <= 1 {
+        return false
+    }
+    if n <= 3 {
+        return true
+    }
+    un := uint64(n)
+    if un%2 == 0 || un%3 == 0 {
+        return false
+    }
+
+    // Factor n - 1 into 2^s * d.
+    d := un - 1
+    s := 0
+    for d%2 == 0 {
+        d /= 2
+        s++
+    }
+
+    for _, a := range millerRabinBases {
+        if a >= un {
+            a %= un
+            if a == 0 {
+                continue
+            }
+        }
+
+        x := modPow(a, d, un)
+        if x == 1 || x == un-1 {
+            continue
+        }
+
+        composite := true
+        for r := 0; r < s-1; r++ {
+            x = modMul(x, x, un)
+            if x == un-1 {
+                composite = false
+                break
+            }
+        }
+        if composite {
+            return false
+        }
+    }
+
+    return true
 }
 
 // GenerateHtml formats the primality result for number as the HTML

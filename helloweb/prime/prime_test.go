@@ -3,10 +3,15 @@ package prime
 import (
     "fmt"
     "testing"
+    "time"
 )
 
+// maxEvalDuration is the acceptance-criteria budget (issue #53) for a
+// single IsPrime evaluation near the 64-bit boundary.
+const maxEvalDuration = 250 * time.Millisecond
+
 func TestIsPrimeSmallPrimes(t *testing.T) {
-    for _, n := range []int64{1, 2, 3, 5, 7, 11, 23, 29, 37, 97, 107} {
+    for _, n := range []int64{2, 3, 5, 7, 11, 23, 29, 37, 97, 107} {
         if !IsPrime(n) {
             t.Errorf("IsPrime(%d) = false, want true", n)
         }
@@ -14,19 +19,13 @@ func TestIsPrimeSmallPrimes(t *testing.T) {
 }
 
 func TestIsPrimeSmallComposites(t *testing.T) {
-    for _, n := range []int64{4, 6, 8, 9, 10, 24, 25, 38, 99, 115} {
+    for _, n := range []int64{1, 4, 6, 8, 9, 10, 24, 25, 38, 99, 115} {
         if IsPrime(n) {
             t.Errorf("IsPrime(%d) = true, want false", n)
         }
     }
 }
 
-// TestIsPrimeLargerPrimes exercises the 6k+/-1 loop with primes large
-// enough to require it, but small enough to stay fast: this algorithm is
-// O(sqrt(n)) trial division, which is impractical near the 64-bit
-// boundary (n ~ 2^63 means sqrt(n) ~ 3 billion loop iterations). Proving
-// primality of numbers at that scale is deferred to issue #53, which
-// will replace this with a deterministic Miller-Rabin test.
 func TestIsPrimeLargerPrimes(t *testing.T) {
     for _, n := range []int64{7919, 104729, 15485863, 999999937} {
         if !IsPrime(n) {
@@ -35,13 +34,54 @@ func TestIsPrimeLargerPrimes(t *testing.T) {
     }
 }
 
-// TestIsPrimeMaxInt64 covers 2^63-1, the maximum signed 64-bit integer.
-// It is not prime and, usefully, has a small factor, so trial division
-// resolves it quickly despite its size.
+// TestIsPrimeMaxInt64 covers 2^63-1, the maximum signed 64-bit integer,
+// which is not prime.
 func TestIsPrimeMaxInt64(t *testing.T) {
     n := int64(9223372036854775807)
     if IsPrime(n) {
         t.Errorf("IsPrime(%d) = true, want false", n)
+    }
+}
+
+// TestIsPrimeLargestInt64PrimePerf covers 2^63-25, the largest prime
+// that fits in a signed 64-bit integer, and the issue #53 acceptance
+// criterion that evaluating it takes 250ms or less.
+func TestIsPrimeLargestInt64PrimePerf(t *testing.T) {
+    n := int64(9223372036854775783)
+
+    start := time.Now()
+    got := IsPrime(n)
+    elapsed := time.Since(start)
+
+    if !got {
+        t.Errorf("IsPrime(%d) = false, want true", n)
+    }
+    if elapsed > maxEvalDuration {
+        t.Errorf("IsPrime(%d) took %v, want <= %v", n, elapsed, maxEvalDuration)
+    }
+}
+
+// TestIsPrimeUpperBoundaryPerf covers the issue #53 acceptance criterion
+// that every value from 2^63-24 up to 2^63-1 evaluates in 250ms or less.
+// All 24 are composite (2^63-25 is the largest prime below 2^63).
+func TestIsPrimeUpperBoundaryPerf(t *testing.T) {
+    const maxInt64 = int64(9223372036854775807)
+    // Computed as an offset from maxInt64 rather than a directly
+    // incrementing loop variable: incrementing n up to and past maxInt64
+    // would overflow back to math.MinInt64, which is still <= maxInt64,
+    // turning this into a practically infinite loop.
+    for offset := int64(23); offset >= 0; offset-- {
+        n := maxInt64 - offset
+        start := time.Now()
+        got := IsPrime(n)
+        elapsed := time.Since(start)
+
+        if got {
+            t.Errorf("IsPrime(%d) = true, want false", n)
+        }
+        if elapsed > maxEvalDuration {
+            t.Errorf("IsPrime(%d) took %v, want <= %v", n, elapsed, maxEvalDuration)
+        }
     }
 }
 
