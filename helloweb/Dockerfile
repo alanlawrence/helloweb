@@ -29,7 +29,12 @@ RUN echo $(go env) # debug
 RUN echo $(pwd)    # debug
 WORKDIR /go/src/helloweb
 RUN go test -v ./...
-RUN go install helloweb/webserver
+
+# GIT_COMMIT is passed in via --build-arg (see build.sh) and baked into the
+# binary as main.buildETag, so RootHandler serves a stable ETag tied to the
+# source revision instead of falling back to epoch seconds (see issue #55).
+ARG GIT_COMMIT=""
+RUN go install -ldflags "-X main.buildETag=${GIT_COMMIT}" helloweb/webserver
 
 # Now switch the image to the one we want to run in. The last image
 # specified is the one that the built container uses.

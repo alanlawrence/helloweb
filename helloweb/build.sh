@@ -37,8 +37,10 @@ gcloud config get project
 
 echo
 echo "Make sure the registry is populated with our container image."
+GIT_COMMIT=$(git rev-parse --short HEAD)
+echo "Baking in git commit $GIT_COMMIT as the build-time ETag (issue #55)."
 echo "Running docker build and push commands for europe-docker.pkg.dev/${PROJECT_ID}/$APP_NAME:v$NEW_VER"
-docker build -t europe-docker.pkg.dev/${PROJECT_ID}/helloweb-repo/$APP_NAME:v$NEW_VER .
+docker build --build-arg GIT_COMMIT=$GIT_COMMIT -t europe-docker.pkg.dev/${PROJECT_ID}/helloweb-repo/$APP_NAME:v$NEW_VER .
 read -ep "Push to Artifact Registry? (y/n): " push
 if [ $push != "y" ]
 then 
