@@ -178,7 +178,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("Serving request: %s", r.URL.Path)
     host, _ := os.Hostname()
     fmt.Fprintf(w, "Hello, web!\n")
-    fmt.Fprintf(w, "Version: 3.5.0\n")
+    fmt.Fprintf(w, "Version: 3.5.1\n")
     fmt.Fprintf(w, "Hostname: %s\n", host)
     fmt.Fprintf(w, "Private message: Daddy loves you Pops!\n")
     fmt.Fprintf(w, "Time: %v\n", time.Now())
