@@ -43,6 +43,58 @@ func TestPrimeHandler(t *testing.T) {
     }
 }
 
+// TestHyphenHandler covers the /hyphen endpoint's query-param wiring;
+// hyphenation logic itself is covered by helloweb/hyphenate's tests.
+func TestHyphenHandler(t *testing.T) {
+    tests := []struct {
+        name   string
+        target string
+        want   string
+    }{
+        {"simple string", "/hyphen?text=My%20file", "My-file"},
+        {"missing param", "/hyphen", ""},
+    }
+
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            req := httptest.NewRequest(http.MethodGet, tc.target, nil)
+            rec := httptest.NewRecorder()
+
+            HyphenHandler(rec, req)
+
+            body, err := io.ReadAll(rec.Result().Body)
+            if err != nil {
+                t.Fatalf("reading response body: %v", err)
+            }
+            if got := string(body); got != tc.want {
+                t.Errorf("HyphenHandler(%s) body = %q, want %q", tc.target, got, tc.want)
+            }
+        })
+    }
+}
+
+// TestHyphenHandlerRejectsOverMaxLength covers the issue #56 criterion 4
+// error path through the handler's query-param wiring.
+func TestHyphenHandlerRejectsOverMaxLength(t *testing.T) {
+    longText := ""
+    for i := 0; i < 257; i++ {
+        longText += "a"
+    }
+    req := httptest.NewRequest(http.MethodGet, "/hyphen?text="+longText, nil)
+    rec := httptest.NewRecorder()
+
+    HyphenHandler(rec, req)
+
+    body, err := io.ReadAll(rec.Result().Body)
+    if err != nil {
+        t.Fatalf("reading response body: %v", err)
+    }
+    want := "Strings submitted for hyphenation  must be less than or equal to 256 characters"
+    if got := string(body); got != want {
+        t.Errorf("HyphenHandler body = %q, want %q", got, want)
+    }
+}
+
 func TestRootHandler(t *testing.T) {
     tests := []struct {
         name       string

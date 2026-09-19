@@ -21,6 +21,7 @@ import (
     "os"
     "strconv"
     "time"
+    "helloweb/hyphenate" // Hyphenate turns arbitrary strings into URL-safe slugs.
     ld "helloweb/longDiv" // LongDiv produces long division working.
     lm "helloweb/longmult" // LongMult produces long multiplication working.
     "helloweb/prime" // Prime tests for primality.
@@ -121,6 +122,7 @@ func main() {
     server.HandleFunc("/longdiv", LongDivHandler)
     server.HandleFunc("/quadratic", QuadraticHandler)
     server.HandleFunc("/ar-series/{output}", ArSeriesHandler)
+    server.HandleFunc("/hyphen", HyphenHandler)
 
 
 
@@ -178,7 +180,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("Serving request: %s", r.URL.Path)
     host, _ := os.Hostname()
     fmt.Fprintf(w, "Hello, web!\n")
-    fmt.Fprintf(w, "Version: 3.5.1\n")
+    fmt.Fprintf(w, "Version: 3.6.0\n")
     fmt.Fprintf(w, "Hostname: %s\n", host)
     fmt.Fprintf(w, "Private message: Daddy loves you Pops!\n")
     fmt.Fprintf(w, "Time: %v\n", time.Now())
@@ -374,5 +376,21 @@ func ArSeriesHandler(w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "Rest call /%v/ is not implemented :-(", output)
         fmt.Fprintf(w, " / Found in URL %v", urlStr)
     }
+}
+
+func HyphenHandler(w http.ResponseWriter, r *http.Request) {
+
+    texts, ok := r.URL.Query()["text"]
+
+    if !ok || len(texts[0]) < 1 {
+        log.Println("Url Param 'text' is missing")
+        return
+    }
+
+    // Query()["text"] will return an array of items,
+    // we only want the single item.
+    text := texts[0]
+
+    fmt.Fprintf(w, "%v", hyphenate.CalculateHtml(text))
 }
 

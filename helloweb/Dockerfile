@@ -8,6 +8,7 @@ FROM golang:1.26-alpine AS build-stage
 # /go/src/* directories in the image. We assume we are in the webserver
 # directory.
 ADD digits    /go/src/helloweb/digits
+ADD hyphenate /go/src/helloweb/hyphenate
 ADD longDiv   /go/src/helloweb/longDiv
 ADD longmult  /go/src/helloweb/longmult
 ADD prime     /go/src/helloweb/prime

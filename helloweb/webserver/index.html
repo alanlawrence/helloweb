@@ -26,6 +26,17 @@ function arSum(myA, myD, myN) {
     xmlhttp.send();
 }
 
+function hyphenate(myStr) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("Hyphenate").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET", "hyphen?text=" + encodeURIComponent(myStr), true);
+    xmlhttp.send();
+}
+
 function checkPrime(myNum) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
@@ -82,6 +93,8 @@ function longDiv(myDenom, myNum) {
      Without it the answer flashes up briefly then the page refreshes. -->
 <body>
     <h1 id="toc">Index</h1>
+
+    <h2>Maths utilities</h2>
     <ol>
         <li><a href="#idxQuadratic">Quadratic</a></li>
         <li><a href="#idxARSum">Arithmetic series</a></li>
@@ -89,6 +102,11 @@ function longDiv(myDenom, myNum) {
         <li><a href="#idxGCD">Greatest common divisor</a></li>
         <li><a href="#idxLongMult">Long multiplication</a></li>
         <li><a href="#idxLongDiv">Long division</a></li>
+    </ol>
+
+    <h2>General utilities</h2>
+    <ol>
+        <li><a href="#idxHyphenate">Hyphenation</a></li>
     </ol>
 
     <h1 id="idxQuadratic">Enter the quadratic equation coefficients and get the
@@ -162,6 +180,16 @@ function longDiv(myDenom, myNum) {
         <input type="submit" value="Submit">
     </form>
     Working: <p><pre><span id="LongDiv"></span></pre></p>
+    <p><a href="#toc">Back to index</a></p>
+
+    <h1 id="idxHyphenate">Enter a string and get it hyphenated for use in a
+                          URL</h1>
+    <form onsubmit="hyphenate(document.getElementById('hyphenateStr').value); return false">
+        <label for="hyphenateStr"> string:</label>
+        <input type="text" maxlength="256" id="hyphenateStr" name="hyphenateStr"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <p>Answer: <span id="Hyphenate"></span></p>
     <p><p><a href="#toc">Back to index</a></p></p>
 </body>
 </html>
