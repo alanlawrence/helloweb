@@ -89,7 +89,8 @@ func TestHyphenHandlerRejectsOverMaxLength(t *testing.T) {
     if err != nil {
         t.Fatalf("reading response body: %v", err)
     }
-    want := "Strings submitted for hyphenation  must be less than or equal to 256 characters"
+    want := "Strings submitted for hyphenation must be less than " +
+        "or equal to 256 characters"
     if got := string(body); got != want {
         t.Errorf("HyphenHandler body = %q, want %q", got, want)
     }

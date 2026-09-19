@@ -13,7 +13,7 @@ import (
 const maxLength = 256
 
 // tooLongMsg is the exact error message required by issue #56 criterion 4.
-const tooLongMsg = "Strings submitted for hyphenation  must be less than " +
+const tooLongMsg = "Strings submitted for hyphenation must be less than " +
     "or equal to 256 characters"
 
 // isSpecial reports whether r is one of the characters issue #56 treats as
@@ -37,6 +37,14 @@ func isSpecial(r rune) bool {
 // replaced by a hyphen, runs of hyphens (whether from replacement or
 // already literally present in s) collapsed to one, and any leading or
 // trailing hyphen removed.
+// Design note: the substitution is done long hand to reduce the risk of
+//              error associated with dealing with Go raw strings not
+//              permitting internal backticks and the regex package using
+//              RE2 rather than POSIX ERE like sed. In RE2 backslashes are
+//              active and the resulting escaping of special characters is
+//              hard to read.
+//              This long hand version is quite efficient also at O(n) which
+//              aligns with the lean execution philosophy of this webserver.
 func Hyphenate(s string) string {
     replaced := strings.Map(func(r rune) rune {
         if isSpecial(r) {
