@@ -17,6 +17,12 @@ const maxLength = 256
 const tooLongMsg = "Strings submitted for hyphenation must be less than " +
     "or equal to 256 characters"
 
+// happySuffix and sadSuffix are appended to the /hyphen response fragment
+// on success and error respectively: two blank lines then an ASCII
+// emoticon (issue #60 criteria 1 and 2).
+const happySuffix = "\n\n:-)"
+const sadSuffix = "\n\n:-("
+
 // isSpecial reports whether r is one of the characters treated as a
 // separator: any Unicode white space character (issue #58 -- covers
 // space, tab, newline, carriage return, and the rest of unicode.IsSpace,
@@ -82,12 +88,12 @@ func GenerateHtml(hyphenated string) string {
     return fmt.Sprintf("%v", hyphenated)
 }
 
-// CalculateHtml hyphenates s and returns the result as an HTML fragment.
-// Strings longer than maxLength return the issue #56 error fragment
-// instead (criterion 4).
+// CalculateHtml hyphenates s and returns the result as an HTML fragment,
+// followed by happySuffix. Strings longer than maxLength return the issue
+// #56 error fragment (criterion 4) followed by sadSuffix instead.
 func CalculateHtml(s string) string {
     if utf8.RuneCountInString(s) > maxLength {
-        return tooLongMsg
+        return tooLongMsg + sadSuffix
     }
-    return GenerateHtml(Hyphenate(s))
+    return GenerateHtml(Hyphenate(s)) + happySuffix
 }

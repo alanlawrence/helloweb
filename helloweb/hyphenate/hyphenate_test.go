@@ -105,23 +105,30 @@ func TestGenerateHtml(t *testing.T) {
     }
 }
 
-func TestCalculateHtmlHyphenates(t *testing.T) {
-    if got := CalculateHtml("My file"); got != "My-file" {
-        t.Errorf("CalculateHtml(%q) = %q, want %q", "My file", got, "My-file")
+// TestCalculateHtmlHappySuffix covers issue #60 criterion 1: a successful
+// hyphenation gets two blank lines and a smiley appended.
+func TestCalculateHtmlHappySuffix(t *testing.T) {
+    want := "My-file\n\n:-)"
+    if got := CalculateHtml("My file"); got != want {
+        t.Errorf("CalculateHtml(%q) = %q, want %q", "My file", got, want)
     }
 }
 
 func TestCalculateHtmlAcceptsMaxLength(t *testing.T) {
     in := strings.Repeat("a", maxLength)
-    if got := CalculateHtml(in); got != in {
-        t.Errorf("CalculateHtml(256 char string) = %q, want unchanged input", got)
+    want := in + "\n\n:-)"
+    if got := CalculateHtml(in); got != want {
+        t.Errorf("CalculateHtml(256 char string) = %q, want %q", got, want)
     }
 }
 
-func TestCalculateHtmlRejectsOverMaxLength(t *testing.T) {
+// TestCalculateHtmlSadSuffix covers issue #60 criterion 2: an error
+// message gets two blank lines and a sad face appended.
+func TestCalculateHtmlSadSuffix(t *testing.T) {
     in := strings.Repeat("a", maxLength+1)
+    want := tooLongMsg + "\n\n:-("
     got := CalculateHtml(in)
-    if got != tooLongMsg {
-        t.Errorf("CalculateHtml(257 char string) = %q, want %q", got, tooLongMsg)
+    if got != want {
+        t.Errorf("CalculateHtml(257 char string) = %q, want %q", got, want)
     }
 }

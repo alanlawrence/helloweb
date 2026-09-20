@@ -51,7 +51,7 @@ func TestHyphenHandler(t *testing.T) {
         target string
         want   string
     }{
-        {"simple string", "/hyphen?text=My%20file", "My-file"},
+        {"simple string", "/hyphen?text=My%20file", "My-file\n\n:-)"},
         {"missing param", "/hyphen", ""},
     }
 
@@ -90,7 +90,7 @@ func TestHyphenHandlerRejectsOverMaxLength(t *testing.T) {
         t.Fatalf("reading response body: %v", err)
     }
     want := "Strings submitted for hyphenation must be less than " +
-        "or equal to 256 characters"
+        "or equal to 256 characters\n\n:-("
     if got := string(body); got != want {
         t.Errorf("HyphenHandler body = %q, want %q", got, want)
     }
