@@ -26,15 +26,72 @@ function arSum(myA, myD, myN) {
     xmlhttp.send();
 }
 
+// This is the function for the last form in the list so we ensure the
+// element is scrolled into view such that the bottom of the element (the
+// answer), is aligned with the bottom of the visible area.
+// The scrollIntoView param1=false to achieve this.
 function hyphenate(myStr) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Hyphenate").innerHTML = this.responseText;
+            let hyphenateElement = document.getElementById("Hyphenate");
+            hyphenateElement.innerHTML = this.responseText;
+            hyphenateElement.scrollIntoView(false);
         }
     };
     xmlhttp.open("GET", "hyphen?text=" + encodeURIComponent(myStr), true);
     xmlhttp.send();
+}
+
+function hyphenateKeydown(event) {
+    // Hyphenated strings are used in URLs, so no line breaks of any kind
+    // are allowed. Plain enter submits the form; shift+enter is ignored
+    // rather than inserting a line break.
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        if (!event.shiftKey) {
+            document.getElementById('hyphenateForm').requestSubmit();
+        }
+    }
+}
+
+let hyphenateBaseHeight = null;
+
+function resizeHyphenateBox(box) {
+    // Allow the text area to grow as the user enters the string, but only
+    // up to the max-width/max-height set on it in CSS. First grow the
+    // width then grow the height.
+    //
+    // The box's single-line height is captured on first use, before it
+    // is ever resized, so it can be restored later without repeating
+    // the '1.5em' set in this element's CSS.
+    if (hyphenateBaseHeight === null) {
+        hyphenateBaseHeight = getComputedStyle(box).height;
+    }
+    let maxWidth = parseFloat(getComputedStyle(box).maxWidth);
+    let maxHeight = parseFloat(getComputedStyle(box).maxHeight);
+
+    // Step 1: Force text to stay on a single line temporarily to measure
+    //         its true width.
+    box.style.whiteSpace = 'pre';
+    box.style.width = 'auto';
+
+    // Step 2: Widen to fit text, capped at max-width.
+    let measuredWidth = Math.min(box.scrollWidth, maxWidth);
+    box.style.width = measuredWidth + 'px';
+
+    // Step 3: Check if max width was hit.
+    if (measuredWidth >= maxWidth) {
+        // Max width reached: re-enable text wrapping and grow height
+        // dynamically.
+        box.style.whiteSpace = 'normal';
+        box.style.height = 'auto';
+        box.style.height = Math.min(box.scrollHeight, maxHeight) + 'px';
+    } else {
+        // Under max width: keep it strictly single-line high.
+        box.style.whiteSpace = 'pre';
+        box.style.height = hyphenateBaseHeight;
+    }
 }
 
 function checkPrime(myNum) {
@@ -70,9 +127,9 @@ function longMult(myNum1, myNum2) {
     xmlhttp.send();
 }
 
-// This is the function for the last form in the list so we ensure the element
-// is scrolled into view such that the bottom of the element (the working
-// out), is aligned with the bottom of the visible area.
+// We ensure the element is scrolled into view such that the bottom of the
+// element (the working out), is aligned with the bottom of the visible
+// area, since the working can be taller than the viewport.
 // The scrollIntoView param1=false to achieve this.
 function longDiv(myDenom, myNum) {
     var xmlhttp = new XMLHttpRequest();
@@ -184,9 +241,26 @@ function longDiv(myDenom, myNum) {
 
     <h1 id="idxHyphenate">Enter a string and get it hyphenated for use in a
                           URL</h1>
-    <form onsubmit="hyphenate(document.getElementById('hyphenateStr').value); return false">
-        <label for="hyphenateStr"> string:</label>
-        <input type="text" maxlength="256" id="hyphenateStr" name="hyphenateStr"><br><br>
+    <form id="hyphenateForm"
+          onsubmit="hyphenate(document.getElementById('hyphenateStr').value);
+          return false">
+        <label for="hyphenateStr">string:</label><br>
+        <textarea
+            maxlength="256"
+            id="hyphenateStr"
+            name="hyphenateStr"
+            onkeydown="hyphenateKeydown(event)"
+            oninput="resizeHyphenateBox(this)"
+            style="
+                max-width: 600px;
+                max-height: 50px;
+                height: 1.5em;
+                resize: none;
+                overflow-y: auto;
+                box-sizing: border-box;
+                white-space: pre;
+            "
+        ></textarea><br><br>
         <input type="submit" value="Submit">
     </form>
     <p>Answer: <span id="Hyphenate"></span></p>
