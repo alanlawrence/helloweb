@@ -79,6 +79,26 @@ func TestHyphenateEmptyAndAllSpecial(t *testing.T) {
     }
 }
 
+// TestHyphenateWhitespaceCharacters covers issue #58: any white space
+// character submitted to the endpoint (not just the literal space a UI
+// might otherwise restrict entry to) must be treated as a separator.
+func TestHyphenateWhitespaceCharacters(t *testing.T) {
+    cases := []struct{ in, want string }{
+        {"My\nfile", "My-file"},     // shift+enter / line feed
+        {"My\r\nfile", "My-file"},   // carriage return + line feed
+        {"My\tfile", "My-file"},     // tab
+        {"My\vfile", "My-file"},     // vertical tab
+        {"My\ffile", "My-file"},     // form feed
+        {"My\u00A0file", "My-file"}, // non-breaking space
+        {"\n\tMy file\r\n", "My-file"},
+    }
+    for _, c := range cases {
+        if got := Hyphenate(c.in); got != c.want {
+            t.Errorf("Hyphenate(%q) = %q, want %q", c.in, got, c.want)
+        }
+    }
+}
+
 func TestGenerateHtml(t *testing.T) {
     if got := GenerateHtml("My-file"); got != "My-file" {
         t.Errorf("GenerateHtml(%q) = %q, want %q", "My-file", got, "My-file")

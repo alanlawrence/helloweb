@@ -5,6 +5,7 @@ package hyphenate
 import (
     "fmt"
     "strings"
+    "unicode"
     "unicode/utf8"
 )
 
@@ -16,16 +17,21 @@ const maxLength = 256
 const tooLongMsg = "Strings submitted for hyphenation must be less than " +
     "or equal to 256 characters"
 
-// isSpecial reports whether r is one of the characters issue #56 treats as
-// a separator: whitespace, underscore, and the punctuation listed in the
-// issue's "Special characters" section. Note that this set includes every
-// character HTML treats specially when injected via innerHTML (< > & " '),
-// so hyphenated output is inherently free of those characters -- no
-// separate escaping is needed before it is written into the response
-// fragment.
+// isSpecial reports whether r is one of the characters treated as a
+// separator: any Unicode white space character (issue #58 -- covers
+// space, tab, newline, carriage return, and the rest of unicode.IsSpace,
+// not just the literal ' ' a UI might otherwise restrict entry to),
+// underscore, and the punctuation listed in issue #56's "Special
+// characters" section. Note that this set includes every character HTML
+// treats specially when injected via innerHTML (< > & " '), so hyphenated
+// output is inherently free of those characters -- no separate escaping
+// is needed before it is written into the response fragment.
 func isSpecial(r rune) bool {
+    if unicode.IsSpace(r) {
+        return true
+    }
     switch r {
-    case ' ', '_', '£', '$', '%', '^', '&', '*', '(', ')', '+', '=',
+    case '_', '£', '$', '%', '^', '&', '*', '(', ')', '+', '=',
         '\\', '/', '|', '!', '"', '{', '}', '[', ']', ';', ':', '#',
         ',', '<', '>', '?', '¬', '`', '\'':
         return true
