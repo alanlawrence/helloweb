@@ -1,5 +1,5 @@
 // Package hyphenate provides string hyphenation and the HTML fragment
-// generation used by the /hyphen webserver endpoint.
+// generation used by the /hyphenate webserver endpoint.
 package hyphenate
 
 import (
@@ -17,9 +17,9 @@ const maxLength = 256
 const tooLongMsg = "Strings submitted for hyphenation must be less than " +
     "or equal to 256 characters"
 
-// happySuffix and sadSuffix are appended to the /hyphen response fragment
-// on success and error respectively: two blank lines then an ASCII
-// emoticon (issue #60 criteria 1 and 2).
+// happySuffix and sadSuffix are appended to the /hyphenate response
+// fragment on success and error respectively: two blank lines then an
+// ASCII emoticon (issue #60 criteria 1 and 2).
 const happySuffix = "\n\n:-)"
 const sadSuffix = "\n\n:-("
 
@@ -83,7 +83,7 @@ func Hyphenate(s string) string {
 }
 
 // GenerateHtml formats the hyphenation result as the HTML fragment the
-// /hyphen endpoint responds with.
+// /hyphenate endpoint responds with.
 func GenerateHtml(hyphenated string) string {
     return fmt.Sprintf("%v", hyphenated)
 }

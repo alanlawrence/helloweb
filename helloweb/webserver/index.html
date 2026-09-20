@@ -39,7 +39,7 @@ function hyphenate(myStr) {
             hyphenateElement.scrollIntoView(false);
         }
     };
-    xmlhttp.open("GET", "hyphen?text=" + encodeURIComponent(myStr), true);
+    xmlhttp.open("GET", "hyphenate?string=" + encodeURIComponent(myStr), true);
     xmlhttp.send();
 }
 

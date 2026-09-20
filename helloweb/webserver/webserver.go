@@ -122,7 +122,7 @@ func main() {
     server.HandleFunc("/longdiv", LongDivHandler)
     server.HandleFunc("/quadratic", QuadraticHandler)
     server.HandleFunc("/ar-series/{output}", ArSeriesHandler)
-    server.HandleFunc("/hyphen", HyphenHandler)
+    server.HandleFunc("/hyphenate", HyphenateHandler)
 
 
 
@@ -378,19 +378,19 @@ func ArSeriesHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-func HyphenHandler(w http.ResponseWriter, r *http.Request) {
+func HyphenateHandler(w http.ResponseWriter, r *http.Request) {
 
-    texts, ok := r.URL.Query()["text"]
+    strs, ok := r.URL.Query()["string"]
 
-    if !ok || len(texts[0]) < 1 {
-        log.Println("Url Param 'text' is missing")
+    if !ok || len(strs[0]) < 1 {
+        log.Println("Url Param 'string' is missing")
         return
     }
 
-    // Query()["text"] will return an array of items,
+    // Query()["string"] will return an array of items,
     // we only want the single item.
-    text := texts[0]
+    str := strs[0]
 
-    fmt.Fprintf(w, "%v", hyphenate.CalculateHtml(text))
+    fmt.Fprintf(w, "%v", hyphenate.CalculateHtml(str))
 }
 

@@ -43,16 +43,17 @@ func TestPrimeHandler(t *testing.T) {
     }
 }
 
-// TestHyphenHandler covers the /hyphen endpoint's query-param wiring;
-// hyphenation logic itself is covered by helloweb/hyphenate's tests.
-func TestHyphenHandler(t *testing.T) {
+// TestHyphenateHandler covers the /hyphenate endpoint's query-param
+// wiring; hyphenation logic itself is covered by helloweb/hyphenate's
+// tests.
+func TestHyphenateHandler(t *testing.T) {
     tests := []struct {
         name   string
         target string
         want   string
     }{
-        {"simple string", "/hyphen?text=My%20file", "My-file\n\n:-)"},
-        {"missing param", "/hyphen", ""},
+        {"simple string", "/hyphenate?string=My%20file", "My-file\n\n:-)"},
+        {"missing param", "/hyphenate", ""},
     }
 
     for _, tc := range tests {
@@ -60,30 +61,30 @@ func TestHyphenHandler(t *testing.T) {
             req := httptest.NewRequest(http.MethodGet, tc.target, nil)
             rec := httptest.NewRecorder()
 
-            HyphenHandler(rec, req)
+            HyphenateHandler(rec, req)
 
             body, err := io.ReadAll(rec.Result().Body)
             if err != nil {
                 t.Fatalf("reading response body: %v", err)
             }
             if got := string(body); got != tc.want {
-                t.Errorf("HyphenHandler(%s) body = %q, want %q", tc.target, got, tc.want)
+                t.Errorf("HyphenateHandler(%s) body = %q, want %q", tc.target, got, tc.want)
             }
         })
     }
 }
 
-// TestHyphenHandlerRejectsOverMaxLength covers the issue #56 criterion 4
-// error path through the handler's query-param wiring.
-func TestHyphenHandlerRejectsOverMaxLength(t *testing.T) {
+// TestHyphenateHandlerRejectsOverMaxLength covers the issue #56
+// criterion 4 error path through the handler's query-param wiring.
+func TestHyphenateHandlerRejectsOverMaxLength(t *testing.T) {
     longText := ""
     for i := 0; i < 257; i++ {
         longText += "a"
     }
-    req := httptest.NewRequest(http.MethodGet, "/hyphen?text="+longText, nil)
+    req := httptest.NewRequest(http.MethodGet, "/hyphenate?string="+longText, nil)
     rec := httptest.NewRecorder()
 
-    HyphenHandler(rec, req)
+    HyphenateHandler(rec, req)
 
     body, err := io.ReadAll(rec.Result().Body)
     if err != nil {
@@ -92,7 +93,7 @@ func TestHyphenHandlerRejectsOverMaxLength(t *testing.T) {
     want := "Strings submitted for hyphenation must be less than " +
         "or equal to 256 characters\n\n:-("
     if got := string(body); got != want {
-        t.Errorf("HyphenHandler body = %q, want %q", got, want)
+        t.Errorf("HyphenateHandler body = %q, want %q", got, want)
     }
 }
 
